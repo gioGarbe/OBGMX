@@ -36,9 +36,4 @@ FOR A PARTICULAR PURPOSE.
 -------
 LICENSE
 -------
-DO NOT REDISTRIBUTE.
-I am not sure about the licensing status of this software, since it is
-heavily based on OpenBabel 2.3.2, which is GPL
-Until I figure out what is the best way to proceed, use it only for
-research and academic purposes.
-Please direct all enquiries to garberoglio@ectstar.eu
+Released under the GPL v2.0 lincense. See the LICENSE file of the distribution for details.
