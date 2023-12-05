@@ -1,0 +1,2387 @@
+diff -cr openbabel-2.3.2/data/element.txt openbabel-2.3.2-gg/data/element.txt
+*** openbabel-2.3.2/data/element.txt	2012-10-03 21:08:56.000000000 +0200
+--- openbabel-2.3.2-gg/data/element.txt	2015-01-22 14:52:25.319005051 +0100
+***************
+*** 40,50 ****
+  5	B	2.01	0.84	0.84	1.92	4	10.811	2.04	8.298	0.279723	1.00	0.71	0.71	Boron
+  6	C	2.50	0.76	0.76	1.70	4	12.0107	2.55	11.2603	1.262118	0.40	0.40	0.40	Carbon
+  7	N	3.07	0.71	0.71	1.55	4	14.0067	3.04	14.5341	-0.07	0.05	0.05	1.00	Nitrogen
+! 8	O	3.50	0.66	0.66	1.52	2	15.9994	3.44	13.6181	1.461112	1.00	0.05	0.05	Oxygen
+  9	F	4.10	0.57	0.57	1.47	1	18.9984032	3.98	17.4228	3.4011887	0.50	0.70	1.00	Fluorine
+  10	Ne	0.00	0.58	0.58	1.54	0	20.1797	0.00	21.5645	0	0.70	0.89	0.96	Neon
+  11	Na	1.01	1.66	1.66	2.27	1	22.98977	0.93	5.1391	0.547926	0.67	0.36	0.95	Sodium
+! 12	Mg	1.23	1.41	1.41	1.73	2	24.3050	1.31	7.6462	0	0.54	1.00	0.00	Magnesium
+  13	Al	1.47	1.21	1.21	1.84	6	26.981538	1.61	5.9858	0.43283	0.75	0.65	0.65	Aluminium
+  14	Si	1.74	1.11	1.11	2.10	6	28.0855	1.90	8.1517	1.389521	0.50	0.60	0.60	Silicon
+  15	P	2.06	1.07	1.07	1.80	6	30.973761	2.19	10.4867	0.7465	1.00	0.50	0.00	Phosphorus
+--- 40,50 ----
+  5	B	2.01	0.84	0.84	1.92	4	10.811	2.04	8.298	0.279723	1.00	0.71	0.71	Boron
+  6	C	2.50	0.76	0.76	1.70	4	12.0107	2.55	11.2603	1.262118	0.40	0.40	0.40	Carbon
+  7	N	3.07	0.71	0.71	1.55	4	14.0067	3.04	14.5341	-0.07	0.05	0.05	1.00	Nitrogen
+! 8	O	3.50	0.66	0.66	1.52	4	15.9994	3.44	13.6181	1.461112	1.00	0.05	0.05	Oxygen
+  9	F	4.10	0.57	0.57	1.47	1	18.9984032	3.98	17.4228	3.4011887	0.50	0.70	1.00	Fluorine
+  10	Ne	0.00	0.58	0.58	1.54	0	20.1797	0.00	21.5645	0	0.70	0.89	0.96	Neon
+  11	Na	1.01	1.66	1.66	2.27	1	22.98977	0.93	5.1391	0.547926	0.67	0.36	0.95	Sodium
+! 12	Mg	1.23	1.41	1.41	1.73	6	24.3050	1.31	7.6462	0	0.54	1.00	0.00	Magnesium
+  13	Al	1.47	1.21	1.21	1.84	6	26.981538	1.61	5.9858	0.43283	0.75	0.65	0.65	Aluminium
+  14	Si	1.74	1.11	1.11	2.10	6	28.0855	1.90	8.1517	1.389521	0.50	0.60	0.60	Silicon
+  15	P	2.06	1.07	1.07	1.80	6	30.973761	2.19	10.4867	0.7465	1.00	0.50	0.00	Phosphorus
+diff -cr openbabel-2.3.2/data/UFF.prm openbabel-2.3.2-gg/data/UFF.prm
+*** openbabel-2.3.2/data/UFF.prm	2011-09-15 21:20:40.000000000 +0200
+--- openbabel-2.3.2-gg/data/UFF.prm	2015-09-01 17:24:40.898369188 +0200
+***************
+*** 14,20 ****
+  #  of the type rule (i.e., generic rules first, more specific rules later)
+  #
+  # Parameters follow later
+! # param Atom	r1	theta0	x1	D1	zeta	Z1	Vi	Uj	Xi	Hard	Radius
+  
+  #atom [#0]     Du          Dummy atom (e.g., ligand attachment point)
+  atom [#1]     H_          Generic hydrogen
+--- 14,20 ----
+  #  of the type rule (i.e., generic rules first, more specific rules later)
+  #
+  # Parameters follow later
+! # param Atom    r1  theta0  x1  D1  zeta    Z1  Vi  Uj  Xi  Hard    Radius
+  
+  #atom [#0]     Du          Dummy atom (e.g., ligand attachment point)
+  atom [#1]     H_          Generic hydrogen
+***************
+*** 29,48 ****
+--- 29,60 ----
+  atom [C^1]    C_1         sp hybridized C
+  atom [c]      C_R         aromatic C
+  atom [#6H1D3r5] C_R       aromatic C (cyclopentadienyl ring)
++ ## added by GG to make ZIF-8 come out right
++ atom [#6D3r5] C_R         carbon in 5-membered ring, with 3 neighbors and no H's
++ atom  [$([#6D3]([OX2])([OX2])[#6])] C_R  [C-(O2C)] in IRMOF
++ ###
+  atom [#7]     N_3         Generic sp3 N
+  atom [N^2]    N_2         sp2 non-aromatic N
+  atom [N^1]    N_1         sp hybridized N
+  atom [n]      N_R         aromatic N
++ ## added by GG to make ZIF-8 come out right
++ atom [#7X3r5] N_R         nitrogen in 5-membered ring, with 3 neighbors
+  atom [#8]     O_3         generic, sp3 hybridized O
+  atom [#8][#14] O_3_z      sp3 hybridized O for zeolites
+  atom [O^2]    O_2         sp2 hybridized O
+  atom [O^1]    O_1         sp hybridized O
+  atom [o]      O_R         aromatic O
++ ## added by GG to make IRMOFs come out right
++ atom [#8X4]   O_3_f       UFF4MOF
++ atom [#8X3]   O_2_z       UFF4MOF
+  atom [#9]     F_          generic F
+  atom [#10]    Ne4+4
+  atom [#11]    Na
+  atom [#12]    Mg3+2
++ # octahedral Mg found in some MOFs
++ atom [#12X6]  Mg6
+  atom [#13]    Al3
++ atom [#13X6]  Al6+3       UFF4MOF
+  atom [#14]    Si3
+  #atom [#15]   P_3+q       Organometallic phosphine ligands
+  atom [#15]    P_3+3       generic phosphorus
+***************
+*** 57,73 ****
+--- 69,100 ----
+  atom [#19]    K_
+  atom [#20]    Ca6+2
+  atom [#21]    Sc3+3
++ atom [#21X6]  Sc6+3       UFF4MOF
+  atom [#22]    Ti6+4       generic Ti (6-valent)
+  atom [#22D3]  Ti3+4
++ atom [#22X4]  Ti4+2       UFF4MOF
+  atom [#23]    V_3+5
++ atom [#23X4]  V_4+2       UFF4MOF
++ atom [#23X6]  V_6+3       UFF4MOF
+  atom [#24]    Cr6+3
++ atom [#24X4]  Cr4+2       UFF4MOF
++ atom [#24X6]  Cr6f3       UFF4MOF
+  atom [#25]    Mn6+2
++ atom [#25X6]  Mn6+3       UFF4MOF
++ atom [#25X4]  Mn4+2       UFF4MOF
+  atom [#26]    Fe6+2       generic Fe (6-valent)
+  atom [#26D3]  Fe3+2
++ atom [#26X6]  Fe6+3       UFF4MOF
++ atom [#26X4]  Fe4+2       UFF4MOF
+  atom [#27]    Co6+3
++ atom [#27X4]  Co3+2       UFF4MOF
++ atom [#27D4]  Co4+2       UFF4MOF
+  atom [#28]    Ni4+2
+  atom [#29]    Cu3+1
++ atom [#29X4]  Cu4+2       UFF4MOF
+  atom [#30]    Zn3+2
++ atom [#30X4]  Zn4+2       UFF4MOF
++ atom [#30X4]  Zn3f2       UFF4MOF
+  atom [#31]    Ga3+3
+  atom [#32]    Ge3
+  atom [#33]    As3+3
+***************
+*** 146,277 ****
+  atom [#102]    No6+3
+  atom [#103]    Lw6+3
+  
+! # Atom          r1	theta0	x1	D1	zeta	Z1	Vi	Uj	Xi	Hard	Radius
+! param Du  0.01   180 0.4 5000 12	10.0	0 0 9.66	14.92	0.7
+! param H_	0.354	180	2.886	0.044	12	0.712	0	0	4.528	6.9452	0.371
+! param H_b	0.46	83.5	2.886	0.044	12	0.712	0	0	4.528	6.9452	0.371
+! param He4+4	0.849	90	2.362	0.056	15.24	0.098	0	0	9.66	14.92	1.3
+! param Li	1.336	180	2.451	0.025	12	1.026	0	2	3.006	2.386	1.557
+! param Be3+2	1.074	109.47	2.745	0.085	12	1.565	0	2	4.877	4.443	1.24
+! param B_3	0.838	109.47	4.083	0.18	12.052	1.755	0	2	5.11	4.75	0.822
+! param B_2	0.828	120	4.083	0.18	12.052	1.755	0	2	5.11	4.75	0.822
+! param C_3	0.757	109.47	3.851	0.105	12.73	1.912	2.119	2	5.343	5.063	0.759
+! param C_R	0.729	120	3.851	0.105	12.73	1.912	0	2	5.343	5.063	0.759
+! param C_2	0.732	120	3.851	0.105	12.73	1.912	0	2	5.343	5.063	0.759
+! param C_1	0.706	180	3.851	0.105	12.73	1.912	0	2	5.343	5.063	0.759
+! param N_3	0.7	106.7	3.66	0.069	13.407	2.544	0.45	2	6.899	5.88	0.715
+! param N_R	0.699	120	3.66	0.069	13.407	2.544	0	2	6.899	5.88	0.715
+! param N_2	0.685	111.2	3.66	0.069	13.407	2.544	0	2	6.899	5.88	0.715
+! param N_1	0.656	180	3.66	0.069	13.407	2.544	0	2	6.899	5.88	0.715
+! param O_3	0.658	104.51	3.5	0.06	14.085	2.3	0.018	2	8.741	6.682	0.669
+! param O_3_z	0.528	146	3.5	0.06	14.085	2.3	0.018	2	8.741	6.682	0.669
+! param O_R	0.68	110	3.5	0.06	14.085	2.3	0	2	8.741	6.682	0.669
+! param O_2	0.634	120	3.5	0.06	14.085	2.3	0	2	8.741	6.682	0.669
+! param O_1	0.639	180	3.5	0.06	14.085	2.3	0	2	8.741	6.682	0.669
+! param F_	0.668	180	3.364	0.05	14.762	1.735	0	2	10.874	7.474	0.706
+! param Ne4+4	0.92	90	3.243	0.042	15.44	0.194	0	2	11.04	10.55	1.768
+! param Na	1.539	180	2.983	0.03	12	1.081	0	1.25	2.843	2.296	2.085
+! param Mg3+2	1.421	109.47	3.021	0.111	12	1.787	0	1.25	3.951	3.693	1.5
+! param Al3	1.244	109.47	4.499	0.505	11.278	1.792	0	1.25	4.06	3.59	1.201
+! param Si3	1.117	109.47	4.295	0.402	12.175	2.323	1.225	1.25	4.168	3.487	1.176
+! param P_3+3	1.101	93.8	4.147	0.305	13.072	2.863	2.4	1.25	5.463	4	1.102
+! param P_3+5	1.056	109.47	4.147	0.305	13.072	2.863	2.4	1.25	5.463	4	1.102
+! param P_3+q	1.056	109.47	4.147	0.305	13.072	2.863	2.4	1.25	5.463	4	1.102
+! param S_3+2	1.064	92.1	4.035	0.274	13.969	2.703	0.484	1.25	6.928	4.486	1.047
+! param S_3+4	1.049	103.2	4.035	0.274	13.969	2.703	0.484	1.25	6.928	4.486	1.047
+! param S_3+6	1.027	109.47	4.035	0.274	13.969	2.703	0.484	1.25	6.928	4.486	1.047
+! param S_R	1.077	92.2	4.035	0.274	13.969	2.703	0	1.25	6.928	4.486	1.047
+! param S_2	0.854	120	4.035	0.274	13.969	2.703	0	1.25	6.928	4.486	1.047
+! param Cl	1.044	180	3.947	0.227	14.866	2.348	0	1.25	8.564	4.946	0.994
+! param Ar4+4	1.032	90	3.868	0.185	15.763	0.3	0	1.25	9.465	6.355	2.108
+! param K_	1.953	180	3.812	0.035	12	1.165	0	0.7	2.421	1.92	2.586
+! param Ca6+2	1.761	90	3.399	0.238	12	2.141	0	0.7	3.231	2.88	2
+! param Sc3+3	1.513	109.47	3.295	0.019	12	2.592	0	0.7	3.395	3.08	1.75
+! param Ti3+4	1.412	109.47	3.175	0.017	12	2.659	0	0.7	3.47	3.38	1.607
+! param Ti6+4	1.412	90	3.175	0.017	12	2.659	0	0.7	3.47	3.38	1.607
+! param V_3+5	1.402	109.47	3.144	0.016	12	2.679	0	0.7	3.65	3.41	1.47
+! param Cr6+3	1.345	90	3.023	0.015	12	2.463	0	0.7	3.415	3.865	1.402
+! param Mn6+2	1.382	90	2.961	0.013	12	2.43	0	0.7	3.325	4.105	1.533
+! param Fe3+2	1.27	109.47	2.912	0.013	12	2.43	0	0.7	3.76	4.14	1.393
+! param Fe6+2	1.335	90	2.912	0.013	12	2.43	0	0.7	3.76	4.14	1.393
+! param Co6+3	1.241	90	2.872	0.014	12	2.43	0	0.7	4.105	4.175	1.406
+! param Ni4+2	1.164	90	2.834	0.015	12	2.43	0	0.7	4.465	4.205	1.398
+! param Cu3+1	1.302	109.47	3.495	0.005	12	1.756	0	0.7	4.2	4.22	1.434
+! param Zn3+2	1.193	109.47	2.763	0.124	12	1.308	0	0.7	5.106	4.285	1.4
+! param Ga3+3	1.26	109.47	4.383	0.415	11	1.821	0	0.7	3.641	3.16	1.211
+! param Ge3	1.197	109.47	4.28	0.379	12	2.789	0.701	0.7	4.051	3.438	1.189
+! param As3+3	1.211	92.1	4.23	0.309	13	2.864	1.5	0.7	5.188	3.809	1.204
+! param Se3+2	1.19	90.6	4.205	0.291	14	2.764	0.335	0.7	6.428	4.131	1.224
+! param Br	1.192	180	4.189	0.251	15	2.519	0	0.7	7.79	4.425	1.141
+! param Kr4+4	1.147	90	4.141	0.22	16	0.452	0	0.7	8.505	5.715	2.27
+! param Rb	2.26	180	4.114	0.04	12	1.592	0	0.2	2.331	1.846	2.77
+! param Sr6+2	2.052	90	3.641	0.235	12	2.449	0	0.2	3.024	2.44	2.415
+! param Y_3+3	1.698	109.47	3.345	0.072	12	3.257	0	0.2	3.83	2.81	1.998
+! param Zr3+4	1.564	109.47	3.124	0.069	12	3.667	0	0.2	3.4	3.55	1.758
+! param Nb3+5	1.473	109.47	3.165	0.059	12	3.618	0	0.2	3.55	3.38	1.603
+! param Mo6+6	1.467	90	3.052	0.056	12	3.4	0	0.2	3.465	3.755	1.53
+! param Mo3+6	1.484	109.47	3.052	0.056	12	3.4	0	0.2	3.465	3.755	1.53
+! param Tc6+5	1.322	90	2.998	0.048	12	3.4	0	0.2	3.29	3.99	1.5
+! param Ru6+2	1.478	90	2.963	0.056	12	3.4	0	0.2	3.575	4.015	1.5
+! param Rh6+3	1.332	90	2.929	0.053	12	3.5	0	0.2	3.975	4.005	1.509
+! param Pd4+2	1.338	90	2.899	0.048	12	3.21	0	0.2	4.32	4	1.544
+! param Ag1+1	1.386	180	3.148	0.036	12	1.956	0	0.2	4.436	3.134	1.622
+! param Cd3+2	1.403	109.47	2.848	0.228	12	1.65	0	0.2	5.034	3.957	1.6
+! param In3+3	1.459	109.47	4.463	0.599	11	2.07	0	0.2	3.506	2.896	1.404
+! param Sn3	1.398	109.47	4.392	0.567	12	2.961	0.199	0.2	3.987	3.124	1.354
+! param Sb3+3	1.407	91.6	4.42	0.449	13	2.704	1.1	0.2	4.899	3.342	1.404
+! param Te3+2	1.386	90.25	4.47	0.398	14	2.882	0.3	0.2	5.816	3.526	1.38
+! param I_	1.382	180	4.5	0.339	15	2.65	0	0.2	6.822	3.762	1.333
+! param Xe4+4	1.267	90	4.404	0.332	12	0.556	0	0.2	7.595	4.975	2.459
+! param Cs	2.57	180	4.517	0.045	12	1.573	0	0.1	2.183	1.711	2.984
+! param Ba6+2	2.277	90	3.703	0.364	12	2.727	0	0.1	2.814	2.396	2.442
+! param La3+3	1.943	109.47	3.522	0.017	12	3.3	0	0.1	2.8355	2.7415	2.071
+! param Ce6+3	1.841	90	3.556	0.013	12	3.3	0	0.1	2.774	2.692	1.925
+! param Pr6+3	1.823	90	3.606	0.01	12	3.3	0	0.1	2.858	2.564	2.007
+! param Nd6+3	1.816	90	3.575	0.01	12	3.3	0	0.1	2.8685	2.6205	2.007
+! param Pm6+3	1.801	90	3.547	0.009	12	3.3	0	0.1	2.881	2.673	2
+! param Sm6+3	1.78	90	3.52	0.008	12	3.3	0	0.1	2.9115	2.7195	1.978
+! param Eu6+3	1.771	90	3.493	0.008	12	3.3	0	0.1	2.8785	2.7875	2.227
+! param Gd6+3	1.735	90	3.368	0.009	12	3.3	0	0.1	3.1665	2.9745	1.968
+! param Tb6+3	1.732	90	3.451	0.007	12	3.3	0	0.1	3.018	2.834	1.954
+! param Dy6+3	1.71	90	3.428	0.007	12	3.3	0	0.1	3.0555	2.8715	1.934
+! param Ho6+3	1.696	90	3.409	0.007	12	3.416	0	0.1	3.127	2.891	1.925
+! param Er6+3	1.673	90	3.391	0.007	12	3.3	0	0.1	3.1865	2.9145	1.915
+! param Tm6+3	1.66	90	3.374	0.006	12	3.3	0	0.1	3.2514	2.9329	2
+! param Yb6+3	1.637	90	3.355	0.228	12	2.618	0	0.1	3.2889	2.965	2.158
+! param Lu6+3	1.671	90	3.64	0.041	12	3.271	0	0.1	2.9629	2.4629	1.896
+! param Hf3+4	1.611	109.47	3.141	0.072	12	3.921	0	0.1	3.7	3.4	1.759
+! param Ta3+5	1.511	109.47	3.17	0.081	12	4.075	0	0.1	5.1	2.85	1.605
+! param W_6+6	1.392	90	3.069	0.067	12	3.7	0	0.1	4.63	3.31	1.538
+! param W_3+4	1.526	109.47	3.069	0.067	12	3.7	0	0.1	4.63	3.31	1.538
+! param W_3+6	1.38	109.47	3.069	0.067	12	3.7	0	0.1	4.63	3.31	1.538
+! param Re6+5	1.372	90	2.954	0.066	12	3.7	0	0.1	3.96	3.92	1.6
+! param Re3+7	1.314	109.47	2.954	0.066	12	3.7	0	0.1	3.96	3.92	1.6
+! param Os6+6	1.372	90	3.12	0.037	12	3.7	0	0.1	5.14	3.63	1.7
+! param Ir6+3	1.371	90	2.84	0.073	12	3.731	0	0.1	5	4	1.866
+! param Pt4+2	1.364	90	2.754	0.08	12	3.382	0	0.1	4.79	4.43	1.557
+! param Au4+3	1.262	90	3.293	0.039	12	2.625	0	0.1	4.894	2.586	1.618
+! param Hg1+2	1.34	180	2.705	0.385	12	1.75	0	0.1	6.27	4.16	1.6
+! param Tl3+3	1.518	120	4.347	0.68	11	2.068	0	0.1	3.2	2.9	1.53
+! param Pb3	1.459	109.47	4.297	0.663	12	2.846	0.1	0.1	3.9	3.53	1.444
+! param Bi3+3	1.512	90	4.37	0.518	13	2.47	1	0.1	4.69	3.74	1.514
+! param Po3+2	1.5	90	4.709	0.325	14	2.33	0.3	0.1	4.21	4.21	1.48
+! param At	1.545	180	4.75	0.284	15	2.24	0	0.1	4.75	4.75	1.47
+! param Rn4+4	1.42	90	4.765	0.248	16	0.583	0	0.1	5.37	5.37	2.2
+! param Fr	2.88	180	4.9	0.05	12	1.847	0	0	2	2	2.3
+! param Ra6+2	2.512	90	3.677	0.404	12	2.92	0	0	2.843	2.434	2.2
+! param Ac6+3	1.983	90	3.478	0.033	12	3.9	0	0	2.835	2.835	2.108
+! param Th6+4	1.721	90	3.396	0.026	12	4.202	0	0	3.175	2.905	2.018
+! param Pa6+4	1.711	90	3.424	0.022	12	3.9	0	0	2.985	2.905	1.8
+! param U_6+4	1.684	90	3.395	0.022	12	3.9	0	0	3.341	2.853	1.713
+! param Np6+4	1.666	90	3.424	0.019	12	3.9	0	0	3.549	2.717	1.8
+! param Pu6+4	1.657	90	3.424	0.016	12	3.9	0	0	3.243	2.819	1.84
+! param Am6+4	1.66	90	3.381	0.014	12	3.9	0	0	2.9895	3.0035	1.942
+! param Cm6+3	1.801	90	3.326	0.013	12	3.9	0	0	2.8315	3.1895	1.9
+! param Bk6+3	1.761	90	3.339	0.013	12	3.9	0	0	3.1935	3.0355	1.9
+! param Cf6+3	1.75	90	3.313	0.013	12	3.9	0	0	3.197	3.101	1.9
+! param Es6+3	1.724	90	3.299	0.012	12	3.9	0	0	3.333	3.089	1.9
+! param Fm6+3	1.712	90	3.286	0.012	12	3.9	0	0	3.4	3.1	1.9
+! param Md6+3	1.689	90	3.274	0.011	12	3.9	0	0	3.47	3.11	1.9
+! param No6+3	1.679	90	3.248	0.011	12	3.9	0	0	3.475	3.175	1.9
+! param Lw6+3	1.698	90	3.236	0.011	12	3.9	0	0	3.5	3.2	1.9
+--- 173,323 ----
+  atom [#102]    No6+3
+  atom [#103]    Lw6+3
+  
+! # Atom          r1  theta0  x1  D1  zeta    Z1  Vi  Uj  Xi  Hard    Radius
+! param Du  0.01   180 0.4 5000 12    10.0    0 0 9.66    14.92   0.7
+! param H_    0.354   180 2.886   0.044   12  0.712   0   0   4.528   6.9452  0.371
+! param H_b   0.46    83.5    2.886   0.044   12  0.712   0   0   4.528   6.9452  0.371
+! param He4+4 0.849   90  2.362   0.056   15.24   0.098   0   0   9.66    14.92   1.3
+! param Li    1.336   180 2.451   0.025   12  1.026   0   2   3.006   2.386   1.557
+! param Be3+2 1.074   109.47  2.745   0.085   12  1.565   0   2   4.877   4.443   1.24
+! param B_3   0.838   109.47  4.083   0.18    12.052  1.755   0   2   5.11    4.75    0.822
+! param B_2   0.828   120 4.083   0.18    12.052  1.755   0   2   5.11    4.75    0.822
+! param C_3   0.757   109.47  3.851   0.105   12.73   1.912   2.119   2   5.343   5.063   0.759
+! param C_R   0.729   120 3.851   0.105   12.73   1.912   0   2   5.343   5.063   0.759
+! param C_2   0.732   120 3.851   0.105   12.73   1.912   0   2   5.343   5.063   0.759
+! param C_1   0.706   180 3.851   0.105   12.73   1.912   0   2   5.343   5.063   0.759
+! param N_3   0.7     106.7   3.66    0.069   13.407  2.544   0.45    2   6.899   5.88    0.715
+! param N_R   0.699   120 3.66    0.069   13.407  2.544   0   2   6.899   5.88    0.715
+! param N_2   0.685   111.2   3.66    0.069   13.407  2.544   0   2   6.899   5.88    0.715
+! param N_1   0.656   180 3.66    0.069   13.407  2.544   0   2   6.899   5.88    0.715
+! param O_3   0.658   104.51  3.5 0.06    14.085  2.3 0.018   2   8.741   6.682   0.669
+! param O_3_z 0.528   146 3.5 0.06    14.085  2.3 0.018   2   8.741   6.682   0.669
+! param O_3_f 0.634   109.47  3.5 0.06    14.085  2.3 0.018   2   8.741 6.682 0.669
+! param O_2_z 0.528   120.0   3.5 0.06    14.085  2.3 0.018   2   8.741   6.682   0.669
+! param O_R   0.68    110 3.5 0.06    14.085  2.3 0   2   8.741   6.682   0.669
+! param O_2   0.634   120 3.5 0.06    14.085  2.3 0   2   8.741   6.682   0.669
+! param O_1   0.639   180 3.5 0.06    14.085  2.3 0   2   8.741   6.682   0.669
+! param F_    0.668   180 3.364   0.05    14.762  1.735   0   2   10.874  7.474   0.706
+! param Ne4+4 0.92    90  3.243   0.042   15.44   0.194   0   2   11.04   10.55   1.768
+! param Na    1.539   180 2.983   0.03    12  1.081   0   1.25    2.843   2.296   2.085
+! param Mg3+2 1.421   109.47  3.021   0.111   12  1.787   0       1.25    3.951   3.693   1.5
+! param Mg6   1.421   90  3.021   0.111   12  1.787   0   1.25    3.951   3.693   1.5
+! param Al3   1.244   109.47  4.499   0.505   11.278  1.792   0   1.25    4.06    3.59    1.201
+! param Al6+3 1.220   90.00   4.499   0.505   11.278  1.792   0   1.25    4.06    3.59    1.201
+! param Si3   1.117   109.47  4.295   0.402   12.175  2.323   1.225   1.25    4.168   3.487   1.176
+! param P_3+3 1.101   93.8    4.147   0.305   13.072  2.863   2.4 1.25    5.463   4   1.102
+! param P_3+5 1.056   109.47  4.147   0.305   13.072  2.863   2.4 1.25    5.463   4   1.102
+! param P_3+q 1.056   109.47  4.147   0.305   13.072  2.863   2.4 1.25    5.463   4   1.102
+! param S_3+2 1.064   92.1    4.035   0.274   13.969  2.703   0.484   1.25    6.928   4.486   1.047
+! param S_3+4 1.049   103.2   4.035   0.274   13.969  2.703   0.484   1.25    6.928   4.486   1.047
+! param S_3+6 1.027   109.47  4.035   0.274   13.969  2.703   0.484   1.25    6.928   4.486   1.047
+! param S_R   1.077   92.2    4.035   0.274   13.969  2.703   0   1.25    6.928   4.486   1.047
+! param S_2   0.854   120 4.035   0.274   13.969  2.703   0   1.25    6.928   4.486   1.047
+! param Cl    1.044   180 3.947   0.227   14.866  2.348   0   1.25    8.564   4.946   0.994
+! param Ar4+4 1.032   90  3.868   0.185   15.763  0.3 0   1.25    9.465   6.355   2.108
+! param K_    1.953   180 3.812   0.035   12  1.165   0   0.7 2.421   1.92    2.586
+! param Ca6+2 1.761   90  3.399   0.238   12  2.141   0   0.7 3.231   2.88    2
+! param Sc3+3 1.513   109.47  3.295   0.019   12  2.592   0   0.7 3.395 3.08    1.75
+! param Sc6+3 1.440    90.00  3.175   0.017   12  2.659   0   0.7 3.395 3.08    1.75
+! param Ti3+4 1.412   109.47  3.175   0.017   12  2.659   0   0.7 3.47    3.38    1.607
+! param Ti6+4 1.412   90.0  3.175   0.017   12  2.659   0   0.7 3.47    3.38    1.607
+! param Ti4+2 1.380   90.0  3.175   0.017   12  2.659   0   0.7 3.47    3.38    1.607
+! param V_3+5 1.402   109.47  3.144   0.016   12  2.679   0   0.7 3.65    3.41    1.47
+! param V_4+2 1.180    90.00  3.144   0.016   12  2.679   0   0.7 3.65    3.41    1.47
+! param V_6+3 1.300    90.00  3.144   0.016   12  2.679   0   0.7 3.65    3.41    1.47
+! param Cr6+3 1.345   90  3.023   0.015   12  2.463   0   0.7 3.415   3.865   1.402
+! param Cr4+2 1.100   90  3.023   0.015   12  2.463   0   0.7 3.415   3.865   1.402
+! param Cr6f3 1.280   90  3.023   0.015   12  2.463   0   0.7 3.415   3.865  1.402
+! param Mn6+2 1.382   90  2.961   0.013   12  2.43    0   0.7 3.325   4.105   1.533
+! param Mn6+3 1.340   90  2.961   0.013   12  2.43    0   0.7 3.325   4.105   1.533
+! param Mn4+2 1.260   90  2.961   0.013   12  2.43    0   0.7 3.325   4.105   1.533
+! param Fe3+2 1.27    109.47  2.912   0.013   12  2.43    0   0.7 3.76    4.14    1.393
+! param Fe6+2 1.335   90  2.912   0.013   12  2.43    0   0.7 3.76    4.14    1.393
+! param Fe6+3 1.320   90  2.912   0.013   12  2.43    0   0.7 3.76    4.14    1.393
+! param Fe4+2 1.100   90  2.912   0.013   12  2.43    0   0.7 3.76    4.14    1.393
+! param Co6+3 1.241   90  2.872   0.014   12  2.43    0   0.7 4.105   4.175   1.406
+! param Co3+2 1.240   90  2.872   0.014   12  1.308   0   0.7 4.105   4.175   1.406
+! param Co6+3 1.160   90  2.872   0.014   12  1.308   0   0.7 4.105   4.175   1.406
+! param Ni4+2 1.164   90  2.834   0.015   12  2.43    0   0.7 4.465   4.205   1.398
+! param Cu3+1 1.302   109.47  3.495   0.005   12  1.756   0   0.7 4.2 4.22    1.434
+! param Cu4+2 1.280    90.00  3.495   0.005   12  2.430   0   0.7 4.2 4.22    1.434
+! param Zn3+2 1.193   109.47  2.763   0.124   12  1.308   0   0.7 5.106   4.285   1.4
+! param Zn4+2 1.340    90.00  2.763   0.124   12  1.308   0   0.7 5.106   4.285   1.4
+! param Zn3f2 1.240   109.47  2.763   0.124   12  1.308   0   0.7 5.106   4.285   1.4
+! param Ga3+3 1.26    109.47  4.383   0.415   11  1.821   0   0.7 3.641   3.16    1.211
+! param Ge3   1.197   109.47  4.28    0.379   12  2.789   0.701   0.7 4.051   3.438   1.189
+! param As3+3 1.211   92.1    4.23    0.309   13  2.864   1.5 0.7 5.188   3.809   1.204
+! param Se3+2 1.19    90.6    4.205   0.291   14  2.764   0.335   0.7 6.428   4.131   1.224
+! param Br    1.192   180 4.189   0.251   15  2.519   0   0.7 7.79    4.425   1.141
+! param Kr4+4 1.147   90  4.141   0.22    16  0.452   0   0.7 8.505   5.715   2.27
+! param Rb    2.26    180 4.114   0.04    12  1.592   0   0.2 2.331   1.846   2.77
+! param Sr6+2 2.052   90  3.641   0.235   12  2.449   0   0.2 3.024   2.44    2.415
+! param Y_3+3 1.698   109.47  3.345   0.072   12  3.257   0   0.2 3.83    2.81    1.998
+! param Zr3+4 1.564   109.47  3.124   0.069   12  3.667   0   0.2 3.4 3.55    1.758
+! param Nb3+5 1.473   109.47  3.165   0.059   12  3.618   0   0.2 3.55    3.38    1.603
+! param Mo6+6 1.467   90  3.052   0.056   12  3.4 0   0.2 3.465   3.755   1.53
+! param Mo3+6 1.484   109.47  3.052   0.056   12  3.4 0   0.2 3.465   3.755   1.53
+! param Tc6+5 1.322   90  2.998   0.048   12  3.4 0   0.2 3.29    3.99    1.5
+! param Ru6+2 1.478   90  2.963   0.056   12  3.4 0   0.2 3.575   4.015   1.5
+! param Rh6+3 1.332   90  2.929   0.053   12  3.5 0   0.2 3.975   4.005   1.509
+! param Pd4+2 1.338   90  2.899   0.048   12  3.21    0   0.2 4.32    4   1.544
+! param Ag1+1 1.386   180 3.148   0.036   12  1.956   0   0.2 4.436   3.134   1.622
+! param Cd3+2 1.403   109.47  2.848   0.228   12  1.65    0   0.2 5.034   3.957   1.6
+! param In3+3 1.459   109.47  4.463   0.599   11  2.07    0   0.2 3.506   2.896   1.404
+! param Sn3   1.398   109.47  4.392   0.567   12  2.961   0.199   0.2 3.987   3.124   1.354
+! param Sb3+3 1.407   91.6    4.42    0.449   13  2.704   1.1 0.2 4.899   3.342   1.404
+! param Te3+2 1.386   90.25   4.47    0.398   14  2.882   0.3 0.2 5.816   3.526   1.38
+! param I_    1.382   180 4.5 0.339   15  2.65    0   0.2 6.822   3.762   1.333
+! param Xe4+4 1.267   90  4.404   0.332   12  0.556   0   0.2 7.595   4.975   2.459
+! param Cs    2.57    180 4.517   0.045   12  1.573   0   0.1 2.183   1.711   2.984
+! param Ba6+2 2.277   90  3.703   0.364   12  2.727   0   0.1 2.814   2.396   2.442
+! param La3+3 1.943   109.47  3.522   0.017   12  3.3 0   0.1 2.8355  2.7415  2.071
+! param Ce6+3 1.841   90  3.556   0.013   12  3.3 0   0.1 2.774   2.692   1.925
+! param Pr6+3 1.823   90  3.606   0.01    12  3.3 0   0.1 2.858   2.564   2.007
+! param Nd6+3 1.816   90  3.575   0.01    12  3.3 0   0.1 2.8685  2.6205  2.007
+! param Pm6+3 1.801   90  3.547   0.009   12  3.3 0   0.1 2.881   2.673   2
+! param Sm6+3 1.78    90  3.52    0.008   12  3.3 0   0.1 2.9115  2.7195  1.978
+! param Eu6+3 1.771   90  3.493   0.008   12  3.3 0   0.1 2.8785  2.7875  2.227
+! param Gd6+3 1.735   90  3.368   0.009   12  3.3 0   0.1 3.1665  2.9745  1.968
+! param Tb6+3 1.732   90  3.451   0.007   12  3.3 0   0.1 3.018   2.834   1.954
+! param Dy6+3 1.71    90  3.428   0.007   12  3.3 0   0.1 3.0555  2.8715  1.934
+! param Ho6+3 1.696   90  3.409   0.007   12  3.416   0   0.1 3.127   2.891   1.925
+! param Er6+3 1.673   90  3.391   0.007   12  3.3 0   0.1 3.1865  2.9145  1.915
+! param Tm6+3 1.66    90  3.374   0.006   12  3.3 0   0.1 3.2514  2.9329  2
+! param Yb6+3 1.637   90  3.355   0.228   12  2.618   0   0.1 3.2889  2.965   2.158
+! param Lu6+3 1.671   90  3.64    0.041   12  3.271   0   0.1 2.9629  2.4629  1.896
+! param Hf3+4 1.611   109.47  3.141   0.072   12  3.921   0   0.1 3.7 3.4 1.759
+! param Ta3+5 1.511   109.47  3.17    0.081   12  4.075   0   0.1 5.1 2.85    1.605
+! param W_6+6 1.392   90  3.069   0.067   12  3.7 0   0.1 4.63    3.31    1.538
+! param W_3+4 1.526   109.47  3.069   0.067   12  3.7 0   0.1 4.63    3.31    1.538
+! param W_3+6 1.38    109.47  3.069   0.067   12  3.7 0   0.1 4.63    3.31    1.538
+! param Re6+5 1.372   90  2.954   0.066   12  3.7 0   0.1 3.96    3.92    1.6
+! param Re3+7 1.314   109.47  2.954   0.066   12  3.7 0   0.1 3.96    3.92    1.6
+! param Os6+6 1.372   90  3.12    0.037   12  3.7 0   0.1 5.14    3.63    1.7
+! param Ir6+3 1.371   90  2.84    0.073   12  3.731   0   0.1 5   4   1.866
+! param Pt4+2 1.364   90  2.754   0.08    12  3.382   0   0.1 4.79    4.43    1.557
+! param Au4+3 1.262   90  3.293   0.039   12  2.625   0   0.1 4.894   2.586   1.618
+! param Hg1+2 1.34    180 2.705   0.385   12  1.75    0   0.1 6.27    4.16    1.6
+! param Tl3+3 1.518   120 4.347   0.68    11  2.068   0   0.1 3.2 2.9 1.53
+! param Pb3   1.459   109.47  4.297   0.663   12  2.846   0.1 0.1 3.9 3.53    1.444
+! param Bi3+3 1.512   90  4.37    0.518   13  2.47    1   0.1 4.69    3.74    1.514
+! param Po3+2 1.5 90  4.709   0.325   14  2.33    0.3 0.1 4.21    4.21    1.48
+! param At    1.545   180 4.75    0.284   15  2.24    0   0.1 4.75    4.75    1.47
+! param Rn4+4 1.42    90  4.765   0.248   16  0.583   0   0.1 5.37    5.37    2.2
+! param Fr    2.88    180 4.9 0.05    12  1.847   0   0   2   2   2.3
+! param Ra6+2 2.512   90  3.677   0.404   12  2.92    0   0   2.843   2.434   2.2
+! param Ac6+3 1.983   90  3.478   0.033   12  3.9 0   0   2.835   2.835   2.108
+! param Th6+4 1.721   90  3.396   0.026   12  4.202   0   0   3.175   2.905   2.018
+! param Pa6+4 1.711   90  3.424   0.022   12  3.9 0   0   2.985   2.905   1.8
+! param U_6+4 1.684   90  3.395   0.022   12  3.9 0   0   3.341   2.853   1.713
+! param Np6+4 1.666   90  3.424   0.019   12  3.9 0   0   3.549   2.717   1.8
+! param Pu6+4 1.657   90  3.424   0.016   12  3.9 0   0   3.243   2.819   1.84
+! param Am6+4 1.66    90  3.381   0.014   12  3.9 0   0   2.9895  3.0035  1.942
+! param Cm6+3 1.801   90  3.326   0.013   12  3.9 0   0   2.8315  3.1895  1.9
+! param Bk6+3 1.761   90  3.339   0.013   12  3.9 0   0   3.1935  3.0355  1.9
+! param Cf6+3 1.75    90  3.313   0.013   12  3.9 0   0   3.197   3.101   1.9
+! param Es6+3 1.724   90  3.299   0.012   12  3.9 0   0   3.333   3.089   1.9
+! param Fm6+3 1.712   90  3.286   0.012   12  3.9 0   0   3.4 3.1 1.9
+! param Md6+3 1.689   90  3.274   0.011   12  3.9 0   0   3.47    3.11    1.9
+! param No6+3 1.679   90  3.248   0.011   12  3.9 0   0   3.475   3.175   1.9
+! param Lw6+3 1.698   90  3.236   0.011   12  3.9 0   0   3.5 3.2 1.9
+diff -cr openbabel-2.3.2/include/openbabel/forcefield.h openbabel-2.3.2-gg/include/openbabel/forcefield.h
+*** openbabel-2.3.2/include/openbabel/forcefield.h	2012-10-03 21:08:17.000000000 +0200
+--- openbabel-2.3.2-gg/include/openbabel/forcefield.h	2015-01-23 12:10:04.969763115 +0100
+***************
+*** 28,38 ****
+--- 28,40 ----
+  #include <openbabel/babelconfig.h>
+  #include <openbabel/base.h>
+  #include <openbabel/mol.h>
++ #include <openbabel/generic.h>
+  #include <openbabel/plugin.h>
+  #include <openbabel/grid.h>
+  #include <openbabel/griddata.h>
+  #include <float.h>
+  
++ using namespace std;
+  namespace OpenBabel
+  {
+    // log levels
+***************
+*** 157,166 ****
+      virtual void SetupPointers()
+      {
+        if (!a || !b) return;
+!       pos_a = a->GetCoordinate();
+        idx_a = a->GetIdx();
+        pos_b = b->GetCoordinate();
+        idx_b = b->GetIdx();
+      }
+    };
+  
+--- 159,169 ----
+      virtual void SetupPointers()
+      {
+        if (!a || !b) return;
+!       pos_a = a->GetCoordinate();      
+        idx_a = a->GetIdx();
+        pos_b = b->GetCoordinate();
+        idx_b = b->GetIdx();
++ 
+      }
+    };
+  
+***************
+*** 225,230 ****
+--- 228,234 ----
+        idx_c = c->GetIdx();
+        pos_d = d->GetCoordinate();
+        idx_d = d->GetIdx();
++ 
+      }
+    };
+  
+***************
+*** 411,416 ****
+--- 415,421 ----
+      double _factor;
+    };
+  
++ 
+    // Class OBForceField
+    // class introduction in forcefield.cpp
+    class OBFPRT OBForceField : public OBPlugin
+***************
+*** 579,584 ****
+--- 584,595 ----
+      std::vector<OBBitVec> _interGroup; //!< groups for which intra-molecular interactions should be calculated
+      std::vector<std::pair<OBBitVec, OBBitVec> > _interGroups; //!< groups for which intra-molecular
+                                                                //!< interactions should be calculated
++ 
++     // For the atomtypes
++     std::vector<string> _atomtype;
++     int _natomtypes;
++     
++     
+    public:
+      /*! Clone the current instance. May be desirable in multithreaded environments,
+       *  Should be deleted after use
+***************
+*** 1674,1679 ****
+--- 1685,1760 ----
+      }
+      //@}
+  
++     // methods to export forcefield parameters
++     // they are declared as virtual functions, which can be overridden
++     // by the particular force-field implementation
++     // GG
++ 
++     // the number of different atom types
++     virtual int NAtomTypes() { return -1; }
++     // the name of the nth type
++     virtual const char* TypeName(int n) { static const char def[16]="NONE"; return def; }
++     // the type of the atom as a number between 0 and NAtomTypes-1
++     virtual int AtomTypeAsNumber(int atom) { return -1; }
++     // the type of the atom as a C-style string
++     char* AtomType(int atom) { 
++       OBAtom *a = _mol.GetAtom(atom+1); 
++       return a->GetType(); }
++ 
++     // the mass of the n-th type
++     double MassOfAtomType(int n) {
++       OBAtom *a;
++       const char *name = TypeName(n);
++       FOR_ATOMS_OF_MOL(a,_mol) {
++         if( !strcmp(a->GetType(),name)) {
++           return a->GetAtomicMass();
++         }
++       }
++       return 0.0;
++     }
++ 
++     // NON-BONDED TERMS
++     virtual double LJEps(const char *name) { return 0.0; }
++     virtual double LJSig(const char *name) { return 0.0; }
++ 
++     // BONDED TERMS
++     // the number of bonds
++     virtual int NBonds() { return -1;}
++     // the number of force-field parameters describing this bond
++     virtual int NBondParams() { return -1;}
++     // the value of the a given parameter for the given bond
++     virtual double BondParam(int bond, int parnum) { return 0.0;}
++     virtual int BondAtomIdx(int bond, int which) { return -1; }
++ 
++     // ANGLE TERMS
++     // the number of angles
++     virtual int NAngles() { return -1;}
++     // the number of force-field parameters describing this bond
++     virtual int NAngleParams() { return -1;}
++     // the value of the a given parameter for the given bond
++     virtual double AngleParam(int angle, int parnum) { return 0.0;}
++     virtual int AngleAtomIdx(int angle, int which) { return -1; }
++ 
++     // TORSION TERMS
++     // the number of torsions
++     virtual int NTorsions() { return -1;}
++     // the number of force-field parameters describing this bond
++     virtual int NTorsionParams() { return -1;}
++     // the value of the a given parameter for the given bond
++     virtual double TorsionParam(int torsion, int parnum) { return 0.0;}
++     virtual int TorsionAtomIdx(int torsion, int which) { return -1; }
++ 
++     // INVERSION (out-of-plane) TERMS
++     // the number of inversions
++     virtual int NInversions() { return -1;}
++     // the number of force-field parameters describing this bond
++     virtual int NInversionParams() { return -1;}
++     // the value of the a given parameter for the given bond
++     virtual double InversionParam(int inv, int parnum) { return 0.0;}
++     virtual int InversionAtomIdx(int inv, int which) { return -1; }
++     
++     // end of virtual functions to export the parameters (GG)
++ 
+    }; // class OBForceField
+  
+  }// namespace OpenBabel
+diff -cr openbabel-2.3.2/include/openbabel/generic.h openbabel-2.3.2-gg/include/openbabel/generic.h
+*** openbabel-2.3.2/include/openbabel/generic.h	2010-10-10 04:05:12.000000000 +0200
+--- openbabel-2.3.2-gg/include/openbabel/generic.h	2015-01-22 14:52:25.323005116 +0100
+***************
+*** 456,466 ****
+--- 456,475 ----
+      //! \param cart Vector of cartesian coordinates
+      //! \return Cartesian coordinates within cell boundaries.
+      vector3 WrapCartesianCoordinate(vector3 cart);
++ 
+      //! Wraps fractional coordinate to fall within the unit cell.
+      //! \param frac Vector of fractional coordinates
+      //! \return Fractional coordinates within cell boundaries (between 0 and 1).
+      vector3 WrapFractionalCoordinate(vector3 frac);
+  
++     //! Finds the position of the minimum image distance
++     //! \param cart Vector of cartesian coordinates
++     //! \return Cartesian coordinates within cell boundaries.
++     // GG
++     vector3 MinimumImage(vector3 cart);
++     vector3 MinimumImageFractional(vector3 cart);
++ 
++ 
+      //! \return The numeric value of the given spacegroup
+      int GetSpaceGroupNumber( std::string name = "" );
+      //! \return The cell volume (in Angstroms^3)
+diff -cr openbabel-2.3.2/include/openbabel/plugin.h openbabel-2.3.2-gg/include/openbabel/plugin.h
+*** openbabel-2.3.2/include/openbabel/plugin.h	2012-10-03 21:08:17.000000000 +0200
+--- openbabel-2.3.2-gg/include/openbabel/plugin.h	2015-01-22 14:52:25.323005116 +0100
+***************
+*** 549,554 ****
+--- 549,556 ----
+    // charges
+    OB_STATIC_PLUGIN(GasteigerCharges, theGasteigerCharges)
+    OB_STATIC_PLUGIN(MMFF94Charges, theMMFF94Charges)
++   // added by GG
++   OB_STATIC_PLUGIN(EEMCharges, theEEMCharges)
+  #ifdef HAVE_EIGEN
+    OB_STATIC_PLUGIN(QEqCharges, theQEqCharges)
+    OB_STATIC_PLUGIN(QTPIECharges, theQTPIECharges)
+diff -cr openbabel-2.3.2/include/openbabel/shared_ptr.h openbabel-2.3.2-gg/include/openbabel/shared_ptr.h
+*** openbabel-2.3.2/include/openbabel/shared_ptr.h	2011-10-12 22:24:02.000000000 +0200
+--- openbabel-2.3.2-gg/include/openbabel/shared_ptr.h	2017-02-07 15:07:09.902463535 +0100
+***************
+*** 21,27 ****
+    #define shared_ptr boost::shared_ptr
+  #else
+    #include <memory>
+!   #if __GNUC__ == 4  //&& __GNUC_MINOR__ < 3  removed at the suggestion of Konstantin Tokarev
+      #include <tr1/memory>
+    #endif
+    using std::tr1::shared_ptr;
+--- 21,27 ----
+    #define shared_ptr boost::shared_ptr
+  #else
+    #include <memory>
+!   #if __GNUC__ >= 4  //&& __GNUC_MINOR__ < 3  removed at the suggestion of Konstantin Tokarev
+      #include <tr1/memory>
+    #endif
+    using std::tr1::shared_ptr;
+diff -cr openbabel-2.3.2/src/atom.cpp openbabel-2.3.2-gg/src/atom.cpp
+*** openbabel-2.3.2/src/atom.cpp	2012-10-03 21:08:15.000000000 +0200
+--- openbabel-2.3.2-gg/src/atom.cpp	2015-01-22 14:52:25.323005116 +0100
+***************
+*** 886,891 ****
+--- 886,897 ----
+      //    vector<OBAtom*>::iterator i;
+      OBBondIterator j,k;
+  
++     // check wheter we are in a periodic system (GG)
++     OBUnitCell *uc = NULL;
++     OBMol *mol = (OBMol*)GetParent();
++     if (mol->HasData(OBGenericDataType::UnitCell))
++       uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
++ 
+      minDegrees = 360.0;
+  
+      for (b = BeginNbrAtom(j); b; b = NextNbrAtom(j))
+***************
+*** 895,900 ****
+--- 901,913 ----
+            {
+              v1 = b->GetVector() - GetVector();
+              v2 = c->GetVector() - GetVector();
++ 
++ 	    // get the minimum image if we are in a periodic system (GG)
++ 	    if(uc) {
++ 	      v1 = uc->MinimumImage(v1);
++ 	      v2 = uc->MinimumImage(v2);
++ 	    }
++ 
+              degrees = vectorAngle(v1, v2);
+              if (degrees < minDegrees)
+                minDegrees = degrees;
+***************
+*** 912,917 ****
+--- 925,936 ----
+      OBBondIterator j,k;
+      int n=0;
+  
++     // check if we are in a periodic system (GG)
++     OBUnitCell *uc = NULL;
++     OBMol *mol = (OBMol*)GetParent();
++     if (mol->HasData(OBGenericDataType::UnitCell))
++       uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
++     
+      avgDegrees = 0.0;
+  
+      for (b = BeginNbrAtom(j); b; b = NextNbrAtom(j))
+***************
+*** 921,926 ****
+--- 940,951 ----
+            {
+              v1 = b->GetVector() - GetVector();
+              v2 = c->GetVector() - GetVector();
++ 
++ 	    // get the minimum image (GG)
++ 	    if(uc) {
++ 	      v1 = uc->MinimumImage(v1);
++ 	      v2 = uc->MinimumImage(v2);
++ 	    }
+              degrees = vectorAngle(v1, v2);
+              avgDegrees += degrees;
+              n++;
+***************
+*** 1077,1097 ****
+  
+    double OBAtom::GetDistance(OBAtom *b)
+    {
+!     return(( this->GetVector() - b->GetVector() ).length());
+    }
+  
+    double OBAtom::GetDistance(int b)
+    {
+      OBMol *mol = (OBMol*)GetParent();
+!     return(( this->GetVector() - mol->GetAtom(b)->GetVector() ).length());
+    }
+  
+    double OBAtom::GetAngle(OBAtom *b, OBAtom *c)
+    {
+      vector3 v1,v2;
+  
+      v1 = this->GetVector() - b->GetVector();
+!     v2 = c->GetVector() - b->GetVector();
+      if (IsNearZero(v1.length(), 1.0e-3)
+        || IsNearZero(v2.length(), 1.0e-3)) {
+          return(0.0);
+--- 1102,1149 ----
+  
+    double OBAtom::GetDistance(OBAtom *b)
+    {
+!     // changed to work in a periodic environment
+!     vector3 origin = this->GetVector();
+!     vector3 vatom  = b->GetVector();
+!     vector3 dist = vatom - origin;
+! 
+!     OBUnitCell *uc = NULL;
+!     OBMol *mol = (OBMol*)GetParent();
+!     if (mol->HasData(OBGenericDataType::UnitCell))
+!       {
+! 	uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
+! 	dist = uc->MinimumImage(dist);
+!       }
+!     
+!     return(dist.length());
+    }
+  
+    double OBAtom::GetDistance(int b)
+    {
++     // changed by GG - it's a wrapper to the function above
+      OBMol *mol = (OBMol*)GetParent();
+!     return(GetDistance(mol->GetAtom(b)));
+!     //return(( this->GetVector() - mol->GetAtom(b)->GetVector() ).length());
+    }
+  
+    double OBAtom::GetAngle(OBAtom *b, OBAtom *c)
+    {
+      vector3 v1,v2;
++     OBUnitCell *uc = NULL;
++     OBMol *mol = (OBMol*)GetParent();
+  
+      v1 = this->GetVector() - b->GetVector();
+!     v2 =    c->GetVector() - b->GetVector();
+! 
+!     // see if we are in a periodic system (GG)
+!     if (mol->HasData(OBGenericDataType::UnitCell))
+!       {
+! 	uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
+! 	v1 = uc->MinimumImage(v1);
+! 	v2 = uc->MinimumImage(v2);
+!       }
+!     
+! 
+      if (IsNearZero(v1.length(), 1.0e-3)
+        || IsNearZero(v2.length(), 1.0e-3)) {
+          return(0.0);
+***************
+*** 1102,1119 ****
+  
+    double OBAtom::GetAngle(int b, int c)
+    {
+      OBMol *mol = (OBMol*)GetParent();
+!     vector3 v1,v2;
+! 
+!     v1 = this->GetVector() - mol->GetAtom(b)->GetVector();
+!     v2 = mol->GetAtom(c)->GetVector() - mol->GetAtom(b)->GetVector();
+! 
+!     if (IsNearZero(v1.length(), 1.0e-3)
+!       || IsNearZero(v2.length(), 1.0e-3)) {
+!         return(0.0);
+!     }
+! 
+!     return(vectorAngle(v1, v2));
+    }
+  
+    bool OBAtom::GetNewBondVector(vector3 &v,double length)
+--- 1154,1164 ----
+  
+    double OBAtom::GetAngle(int b, int c)
+    {
++     // this is now a wrapper to the function above (GG)
+      OBMol *mol = (OBMol*)GetParent();
+!     OBAtom *a1 = mol->GetAtom(b);
+!     OBAtom *a2 = mol->GetAtom(c);
+!     return(GetAngle(a1,a2));
+    }
+  
+    bool OBAtom::GetNewBondVector(vector3 &v,double length)
+diff -cr openbabel-2.3.2/src/bond.cpp openbabel-2.3.2-gg/src/bond.cpp
+*** openbabel-2.3.2/src/bond.cpp	2010-10-19 16:05:07.000000000 +0200
+--- openbabel-2.3.2-gg/src/bond.cpp	2015-01-22 14:52:25.323005116 +0100
+***************
+*** 728,739 ****
+    {
+      double	d2;
+      const OBAtom *begin, *end;
+      begin = GetBeginAtom();
+      end = GetEndAtom();
+  
+!     d2 = SQUARE(begin->GetX() - end->GetX());
+!     d2 += SQUARE(begin->GetY() - end->GetY());
+!     d2 += SQUARE(begin->GetZ() - end->GetZ());
+  
+      return(sqrt(d2));
+    }
+--- 728,755 ----
+    {
+      double	d2;
+      const OBAtom *begin, *end;
++     OBUnitCell *uc = NULL;
++     OBMol *mol;
++     
+      begin = GetBeginAtom();
+      end = GetEndAtom();
+  
+!     // check if we are in a periodic system (GG)
+!     mol = ((OBAtom *)begin)->GetParent();
+!     if (mol->HasData(OBGenericDataType::UnitCell))
+!       {
+! 	vector3 va, vb, vd;
+!      	uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
+! 	va = begin->GetVector();
+! 	vb = end->GetVector();
+! 	vd = uc->MinimumImage(va-vb);
+! 	d2 = vd.length_2();
+!       }
+!     else {
+!       d2 = SQUARE(begin->GetX() - end->GetX());
+!       d2 += SQUARE(begin->GetY() - end->GetY());
+!       d2 += SQUARE(begin->GetZ() - end->GetZ());
+!     }
+  
+      return(sqrt(d2));
+    }
+diff -cr openbabel-2.3.2/src/charges/qtpie.cpp openbabel-2.3.2-gg/src/charges/qtpie.cpp
+*** openbabel-2.3.2/src/charges/qtpie.cpp	2012-10-03 21:07:56.000000000 +0200
+--- openbabel-2.3.2-gg/src/charges/qtpie.cpp	2015-01-22 14:52:25.323005116 +0100
+***************
+*** 103,109 ****
+    */
+  
+  /////////////////////////////////////////////////////////////////
+! QTPIECharges theQTPIECharges("qtpie"); //Global instance
+  
+  /////////////////////////////////////////////////////////////////
+  
+--- 103,109 ----
+    */
+  
+  /////////////////////////////////////////////////////////////////
+!   QTPIECharges theQTPIECharges("qtpie"); //Global instance
+  
+  /////////////////////////////////////////////////////////////////
+  
+diff -cr openbabel-2.3.2/src/forcefields/forcefielduff.cpp openbabel-2.3.2-gg/src/forcefields/forcefielduff.cpp
+*** openbabel-2.3.2/src/forcefields/forcefielduff.cpp	2012-10-03 21:07:57.000000000 +0200
+--- openbabel-2.3.2-gg/src/forcefields/forcefielduff.cpp	2015-05-13 17:05:49.729139854 +0200
+***************
+*** 45,57 ****
+        return;
+      }
+  
+!     vector3 vab, da, db;
+      double delta2, dE;
+  
+      if (gradients) {
+!       rab = OBForceField::VectorBondDerivative(pos_a, pos_b, force_a, force_b);
+      } else {
+!       rab = OBForceField::VectorDistance(pos_a, pos_b);
+      }
+  
+      delta = rab - r0; // we pre-compute the r0 below
+--- 45,83 ----
+        return;
+      }
+  
+!     // changed to consider the minimum image convention (GG)
+!     vector3 da, db;
+      double delta2, dE;
++     OBMol *mol = a->GetParent();
++     OBUnitCell *uc;
++     double my_pos_a[3], my_pos_b[3];
++     
++     da = pos_a;
++     db = pos_b;
++ 
++     //cout << "pos_a: " << pos_a[0] << " " << pos_a[1] << " " << pos_a[2] << endl;
++     //cout << "pos_b: " << pos_b[0] << " " << pos_b[1] << " " << pos_b[2] << endl;
++ 
++     if (mol->HasData(OBGenericDataType::UnitCell))
++       {
++      	uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
++      	db = uc->MinimumImage(db - da);
++      	da.Set(0.0, 0.0, 0.0);	
++       }
++     
++     for(int i=0;i<3;i++) {
++       my_pos_a[i] = da[i];
++       my_pos_b[i] = db[i];
++     }
+  
+      if (gradients) {
+!       //rab = OBForceField::VectorBondDerivative(pos_a, pos_b, force_a, force_b);
+!       rab = OBForceField::VectorBondDerivative(my_pos_a, my_pos_b, force_a, force_b);
+!       //cout << "rab: " << rab << endl;
+! 
+      } else {
+!       //rab = OBForceField::VectorDistance(pos_a, pos_b);
+!       rab = OBForceField::VectorDistance(my_pos_a, my_pos_b);
+      }
+  
+      delta = rab - r0; // we pre-compute the r0 below
+***************
+*** 89,103 ****
+        }
+  
+        IF_OBFF_LOGLVL_HIGH {
+!         snprintf(_logbuf, BUFF_SIZE, "%-5s %-5s  %4.2f%8.3f   %8.3f     %8.3f   %8.3f   %8.3f\n",
+!                  (*i).a->GetType(), (*i).b->GetType(),
+!                  (*i).bt, (*i).rab, (*i).r0, (*i).kb, (*i).delta, (*i).energy);
+          OBFFLog(_logbuf);
+        }
+      }
+  
+      IF_OBFF_LOGLVL_MEDIUM {
+!       snprintf(_logbuf, BUFF_SIZE, "     TOTAL BOND STRETCHING ENERGY = %8.3f %s\n",  energy, GetUnit().c_str());
+        OBFFLog(_logbuf);
+      }
+      return energy;
+--- 115,132 ----
+        }
+  
+        IF_OBFF_LOGLVL_HIGH {
+!         //snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u  %4.2f%8.3f   %8.3f     %8.3f   %8.3f   %8.4f\n",
+!         //         (*i).a->GetIdx(), (*i).b->GetIdx(),
+!         //         (*i).bt, (*i).rab, (*i).r0, (*i).kb, (*i).delta, (*i).energy);
+!         snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u  %5.3f  %10.4f  %6.4f\n",
+!                  (*i).a->GetIdx(), (*i).b->GetIdx(),
+!                  (*i).bt, (*i).kb, (*i).r0);
+          OBFFLog(_logbuf);
+        }
+      }
+  
+      IF_OBFF_LOGLVL_MEDIUM {
+!       snprintf(_logbuf, BUFF_SIZE, "TOTAL BOND STRETCHING ENERGY = %8.3f %s\n",  energy, GetUnit().c_str());
+        OBFFLog(_logbuf);
+      }
+      return energy;
+***************
+*** 111,121 ****
+        return;
+      }
+  
+      vector3 da, db, dc;
+! 		double dE;
+  
+      if (gradients) {
+!       theta = OBForceField::VectorAngleDerivative(pos_a, pos_b, pos_c, force_a, force_b, force_c);
+  
+        if (theta < 2.5 || theta > 355.0) {
+          vector3 v1;
+--- 140,179 ----
+        return;
+      }
+  
++     // changed to consider the minimum image convention (GG)
++     OBMol *mol = a->GetParent();
++     OBUnitCell *uc;
++ 
+      vector3 da, db, dc;
+!     double dE;
+! 
+!     da = pos_a;
+!     db = pos_b;
+!     dc = pos_c;
+  
+      if (gradients) {
+!       double my_pos_a[3], my_pos_b[3], my_pos_c[3];
+! 
+!       if(mol->HasData(OBGenericDataType::UnitCell))
+!       {
+!      	uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
+!      	db = uc->MinimumImage(db - da);
+!      	dc = uc->MinimumImage(dc - da);
+!      	da.Set(0.0, 0.0, 0.0);	
+!       } else {
+! 	da = pos_a;
+! 	db = pos_b;
+! 	dc = pos_c;
+!       }
+!     
+!       for(int i=0;i<3;i++) {
+! 	my_pos_a[i] = da[i];
+! 	my_pos_b[i] = db[i];
+! 	my_pos_c[i] = dc[i];
+!       }
+! 
+!       
+!       theta = OBForceField::VectorAngleDerivative(my_pos_a, my_pos_b, my_pos_c, force_a, force_b, force_c);
+  
+        if (theta < 2.5 || theta > 355.0) {
+          vector3 v1;
+***************
+*** 126,136 ****
+        theta *= DEG_TO_RAD;
+      } else {
+        theta = a->GetAngle(b, c) * DEG_TO_RAD;
+! 		}
+! 
+      if (!isfinite(theta))
+        theta = 0.0; // doesn't explain why GetAngle is returning NaN but solves it for us
+! 
+      double cosT = cos(theta);
+      switch (coord) {
+      case 1: // sp -- linear case, minima at 180 degrees, max (amplitude 2*ka) at 0, 360
+--- 184,194 ----
+        theta *= DEG_TO_RAD;
+      } else {
+        theta = a->GetAngle(b, c) * DEG_TO_RAD;
+!     }
+!     
+      if (!isfinite(theta))
+        theta = 0.0; // doesn't explain why GetAngle is returning NaN but solves it for us
+!     
+      double cosT = cos(theta);
+      switch (coord) {
+      case 1: // sp -- linear case, minima at 180 degrees, max (amplitude 2*ka) at 0, 360
+***************
+*** 196,203 ****
+  
+      IF_OBFF_LOGLVL_HIGH {
+        OBFFLog("\nA N G L E   B E N D I N G\n\n");
+!       OBFFLog("ATOM TYPES       VALENCE     IDEAL      FORCE\n");
+!       OBFFLog(" I    J    K      ANGLE      ANGLE     CONSTANT      DELTA      ENERGY\n");
+        OBFFLog("-----------------------------------------------------------------------------\n");
+      }
+  
+--- 254,261 ----
+  
+      IF_OBFF_LOGLVL_HIGH {
+        OBFFLog("\nA N G L E   B E N D I N G\n\n");
+!       OBFFLog("ATOM TYPES                   IDEAL      FORCE\n");
+!       OBFFLog(" I    J    K      COORD      ANGLE     CONSTANT      C1    C2  ENERGY\n");
+        OBFFLog("-----------------------------------------------------------------------------\n");
+      }
+  
+***************
+*** 213,226 ****
+        }
+  
+        IF_OBFF_LOGLVL_HIGH {
+!         snprintf(_logbuf, BUFF_SIZE, "%-5s %-5s %-5s%8.3f  %8.3f     %8.3f   %8.3f   %8.3f\n", (*i).a->GetType(), (*i).b->GetType(),
+!                  (*i).c->GetType(), (*i).theta * RAD_TO_DEG, (*i).theta0, (*i).ka, (*i).delta, (*i).energy);
+          OBFFLog(_logbuf);
+        }
+      }
+  
+      IF_OBFF_LOGLVL_MEDIUM {
+!       snprintf(_logbuf, BUFF_SIZE, "     TOTAL ANGLE BENDING ENERGY = %8.3f %s\n", energy, GetUnit().c_str());
+        OBFFLog(_logbuf);
+      }
+      return energy;
+--- 271,289 ----
+        }
+  
+        IF_OBFF_LOGLVL_HIGH {
+!         //snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u %-5u %d  %8.3f   %8.3f  %8.3f  %8.3f   %8.4f\n", 
+!         //         (*i).a->GetIdx(), (*i).b->GetIdx(), (*i).c->GetIdx(), 
+!         //         (*i).coord, (*i).theta0, (*i).ka, (*i).c1, (*i).c2, (*i).energy);
+! 
+!         snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u %-5u   %d   %10.4f   %8.4f  %8.4f  %8.4f\n", 
+!                  (*i).a->GetIdx(), (*i).b->GetIdx(), (*i).c->GetIdx(), 
+!                  (*i).coord, (*i).ka, (*i).c0, (*i).c1, (*i).c2);
+          OBFFLog(_logbuf);
+        }
+      }
+  
+      IF_OBFF_LOGLVL_MEDIUM {
+!       snprintf(_logbuf, BUFF_SIZE, "TOTAL ANGLE BENDING ENERGY = %8.3f %s\n", energy, GetUnit().c_str());
+        OBFFLog(_logbuf);
+      }
+      return energy;
+***************
+*** 234,254 ****
+        return;
+      }
+  
+      vector3 da, db, dc, dd;
+      double cosine;
+      double dE;
+  
+      if (gradients) {
+!       tor = OBForceField::VectorTorsionDerivative(pos_a, pos_b, pos_c, pos_d,
+                                                    force_a, force_b, force_c, force_d);
+        if (!isfinite(tor))
+          tor = 1.0e-3;
+        tor *= DEG_TO_RAD;
+      } else {
+        vector3 vab, vbc, vcd, abbc, bccd;
+        vab = a->GetVector() - b->GetVector();
+        vbc = b->GetVector() - c->GetVector();
+        vcd = c->GetVector() - d->GetVector();
+        abbc = cross(vab, vbc);
+        bccd = cross(vbc, vcd);
+  
+--- 297,353 ----
+        return;
+      }
+  
++     // changed to consider the minimum image convention (GG)
+      vector3 da, db, dc, dd;
+      double cosine;
+      double dE;
++     OBMol *mol = a->GetParent();
++     OBUnitCell *uc;
++ 
++     da = pos_a;
++     db = pos_b;
++     dc = pos_c;
++     dd = pos_d;
+  
+      if (gradients) {
+!       double my_pos_a[3], my_pos_b[3], my_pos_c[3], my_pos_d[3];
+!       if (mol->HasData(OBGenericDataType::UnitCell))	{
+! 	uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
+!      	dd = uc->MinimumImage(dd - da);
+!      	dc = uc->MinimumImage(dc - da);
+!      	db = uc->MinimumImage(db - da);
+!      	da.Set(0.0, 0.0, 0.0);	 
+!       }
+! 
+!       for(int i=0;i<3;i++) {
+! 	my_pos_a[i] = da[i];
+! 	my_pos_b[i] = db[i];
+! 	my_pos_c[i] = dc[i];
+! 	my_pos_d[i] = dd[i];
+!       }
+! 
+! 
+!       tor = OBForceField::VectorTorsionDerivative(my_pos_a, my_pos_b, my_pos_c, my_pos_d,
+                                                    force_a, force_b, force_c, force_d);
+        if (!isfinite(tor))
+          tor = 1.0e-3;
+        tor *= DEG_TO_RAD;
+      } else {
++ 
+        vector3 vab, vbc, vcd, abbc, bccd;
+        vab = a->GetVector() - b->GetVector();
+        vbc = b->GetVector() - c->GetVector();
+        vcd = c->GetVector() - d->GetVector();
++ 
++       if (mol->HasData(OBGenericDataType::UnitCell))
++ 	{
++           uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
++           vab = uc->MinimumImage(vab);
++           vbc = uc->MinimumImage(vbc);
++           vcd = uc->MinimumImage(vcd);
++         }
++       
++ 
+        abbc = cross(vab, vbc);
+        bccd = cross(vbc, vcd);
+  
+***************
+*** 282,290 ****
+  
+      IF_OBFF_LOGLVL_HIGH {
+        OBFFLog("\nT O R S I O N A L\n\n");
+!       OBFFLog("----ATOM TYPES-----    FORCE         TORSION\n");
+!       OBFFLog(" I    J    K    L     CONSTANT        ANGLE         ENERGY\n");
+!       OBFFLog("----------------------------------------------------------------\n");
+      }
+  
+      for (i = _torsioncalculations.begin(); i != _torsioncalculations.end(); ++i) {
+--- 381,389 ----
+  
+      IF_OBFF_LOGLVL_HIGH {
+        OBFFLog("\nT O R S I O N A L\n\n");
+!       OBFFLog("----ATOM TYPES-----    FORCE           COS\n");
+!       OBFFLog(" I    J    K    L     CONSTANT        NPHI0         N      ENERGY\n");
+!       OBFFLog("-----------------------------------------------------------------\n");
+      }
+  
+      for (i = _torsioncalculations.begin(); i != _torsioncalculations.end(); ++i) {
+***************
+*** 300,315 ****
+        }
+  
+        IF_OBFF_LOGLVL_HIGH {
+!         snprintf(_logbuf, BUFF_SIZE, "%-5s %-5s %-5s %-5s%6.3f       %8.3f     %8.3f\n",
+!                  (*i).a->GetType(), (*i).b->GetType(),
+!                  (*i).c->GetType(), (*i).d->GetType(), (*i).V,
+!                  (*i).tor * RAD_TO_DEG, (*i).energy);
+          OBFFLog(_logbuf);
+        }
+      }
+  
+      IF_OBFF_LOGLVL_MEDIUM {
+!       snprintf(_logbuf, BUFF_SIZE, "     TOTAL TORSIONAL ENERGY = %8.3f %s\n", energy, GetUnit().c_str());
+        OBFFLog(_logbuf);
+      }
+  
+--- 399,418 ----
+        }
+  
+        IF_OBFF_LOGLVL_HIGH {
+!         //snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u %-5u %-5u%6.3f  %8.3f %d %8.4f\n",
+!         //         (*i).a->GetIdx(), (*i).b->GetIdx(),
+!         //         (*i).c->GetIdx(), (*i).d->GetIdx(), (*i).V,
+!         //         (*i).cosNPhi0, (*i).n, (*i).energy);
+!         snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u %-5u %-5u  %8.4f  %8.4f %d\n",
+!                  (*i).a->GetIdx(), (*i).b->GetIdx(),
+!                  (*i).c->GetIdx(), (*i).d->GetIdx(), 
+! 		 (*i).V, (*i).cosNPhi0, (*i).n);
+          OBFFLog(_logbuf);
+        }
+      }
+  
+      IF_OBFF_LOGLVL_MEDIUM {
+!       snprintf(_logbuf, BUFF_SIZE, "TOTAL TORSIONAL ENERGY = %8.3f %s\n", energy, GetUnit().c_str());
+        OBFFLog(_logbuf);
+      }
+  
+***************
+*** 331,341 ****
+        return;
+      }
+  
+      vector3 da, db, dc, dd;
+      double dE;
+  
+      if (gradients) {
+!       angle = OBForceField::VectorOOPDerivative(pos_a, pos_b, pos_c, pos_d,
+                                                  force_a, force_b, force_c, force_d);
+        angle *= DEG_TO_RAD;
+  
+--- 434,474 ----
+        return;
+      }
+  
++     // changed to consider the minimum image convention (GG)
+      vector3 da, db, dc, dd;
+      double dE;
++     OBMol *mol = a->GetParent();
++     OBUnitCell *uc;
++ 
++     da = pos_a;
++     db = pos_b;
++     dc = pos_c;
++     dd = pos_d;
+  
+      if (gradients) {
+!       double my_pos_a[3], my_pos_b[3], my_pos_c[3], my_pos_d[3];
+! 
+!       if (mol->HasData(OBGenericDataType::UnitCell))	{
+! 	uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
+!      	dd = uc->MinimumImage(dd - da);
+!      	dc = uc->MinimumImage(dc - da);
+!      	db = uc->MinimumImage(db - da);
+!      	da.Set(0.0, 0.0, 0.0);	 
+!       } else {
+! 	da = pos_a;
+! 	db = pos_b;
+! 	dc = pos_c;
+! 	dd = pos_d;
+!       }
+! 
+!       for(int i=0;i<3;i++) {
+! 	my_pos_a[i] = da[i];
+! 	my_pos_b[i] = db[i];
+! 	my_pos_c[i] = dc[i];
+! 	my_pos_d[i] = dd[i];
+!       }
+! 
+!       angle = OBForceField::VectorOOPDerivative(my_pos_a, my_pos_b, my_pos_c, my_pos_d,
+                                                  force_a, force_b, force_c, force_d);
+        angle *= DEG_TO_RAD;
+  
+***************
+*** 349,355 ****
+        OBForceField::VectorSelfMultiply(force_c, dE);
+        OBForceField::VectorSelfMultiply(force_d, dE);
+      } else {
+!       angle = DEG_TO_RAD*Point2PlaneAngle(d->GetVector(), a->GetVector(), b->GetVector(), c->GetVector());
+        if (!isfinite(angle))
+          angle = 0.0; // doesn't explain why GetAngle is returning NaN but solves it for us;
+      }
+--- 482,488 ----
+        OBForceField::VectorSelfMultiply(force_c, dE);
+        OBForceField::VectorSelfMultiply(force_d, dE);
+      } else {
+!       angle = DEG_TO_RAD*Point2PlaneAngle(da,db,dc,dd);
+        if (!isfinite(angle))
+          angle = 0.0; // doesn't explain why GetAngle is returning NaN but solves it for us;
+      }
+***************
+*** 365,372 ****
+  
+      IF_OBFF_LOGLVL_HIGH {
+        OBFFLog("\nO U T - O F - P L A N E   B E N D I N G\n\n");
+!       OBFFLog("ATOM TYPES                 OOP     FORCE \n");
+!       OBFFLog(" I    J     K     L       ANGLE   CONSTANT     ENERGY\n");
+        OBFFLog("----------------------------------------------------------\n");
+      }
+  
+--- 498,505 ----
+  
+      IF_OBFF_LOGLVL_HIGH {
+        OBFFLog("\nO U T - O F - P L A N E   B E N D I N G\n\n");
+!       OBFFLog("ATOM TYPES             FORCE \n");
+!       OBFFLog(" I    J     K     L   CONSTANT   C0    C1    C2    ENERGY\n");
+        OBFFLog("----------------------------------------------------------\n");
+      }
+  
+***************
+*** 382,395 ****
+        }
+  
+        IF_OBFF_LOGLVL_HIGH {
+!         snprintf(_logbuf, BUFF_SIZE, "%-5s %-5s %-5s %-5s%8.3f   %8.3f     %8.3f\n", (*i).a->GetType(), (*i).b->GetType(), (*i).c->GetType(), (*i).d->GetType(),
+!                  (*i).angle * RAD_TO_DEG, (*i).koop, (*i).energy);
+          OBFFLog(_logbuf);
+        }
+      }
+  
+      IF_OBFF_LOGLVL_HIGH {
+!       snprintf(_logbuf, BUFF_SIZE, "     TOTAL OUT-OF-PLANE BENDING ENERGY = %8.3f %s\n", energy, GetUnit().c_str());
+        OBFFLog(_logbuf);
+      }
+      return energy;
+--- 515,532 ----
+        }
+  
+        IF_OBFF_LOGLVL_HIGH {
+!         //snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u %-5u %-5u%8.3f %8.3f %8.3f %8.3f %8.4f\n", 
+!         //         (*i).a->GetIdx(), (*i).b->GetIdx(), (*i).c->GetIdx(), (*i).d->GetIdx(),
+!         //         (*i).koop, (*i).c0, (*i).c1, (*i).c2, (*i).energy);
+!         snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u %-5u %-5u%8.3f %8.3f %8.3f %8.3f\n", 
+!                  (*i).a->GetIdx(), (*i).b->GetIdx(), (*i).c->GetIdx(), (*i).d->GetIdx(),
+!                  (*i).koop, (*i).c0, (*i).c1, (*i).c2);
+          OBFFLog(_logbuf);
+        }
+      }
+  
+      IF_OBFF_LOGLVL_HIGH {
+!       snprintf(_logbuf, BUFF_SIZE, "TOTAL OUT-OF-PLANE BENDING ENERGY = %8.3f %s\n", energy, GetUnit().c_str());
+        OBFFLog(_logbuf);
+      }
+      return energy;
+***************
+*** 403,430 ****
+        return;
+      }
+  
+      vector3 da, db;
+      double term6, term12, dE, term7, term13, rabSquared = 0.0;
+  
+      if (gradients) {
+!       rab = OBForceField::VectorDistanceDerivative(pos_a, pos_b, force_a, force_b);
+! 
+!       if (rab < 1.0e-3)
+!         rab = 1.0e-3;
+! 
+        rabSquared = SQUARE(rab);
+      } else {
+        // Get distance squared (saves a sqrt and multiply)
+        // for every energy evaluation
+        double ab[3];
+        for (unsigned int c = 0; c < 3; ++c)
+!         rabSquared += SQUARE(a->GetCoordinate()[c] - b->GetCoordinate()[c]);
+  
+        // make sure the energy doesn't blow up
+!       if (rabSquared < 1.0e-5)
+!         rabSquared = 1.0e-5;
+      }
+! 
+      // TODO: This actually should include zetas (not always exactly 6-12 for VDW paper)
+  
+      term6 = kaSquared / rabSquared; // ^2
+--- 540,596 ----
+        return;
+      }
+  
++     // changed to consider the minimum image convention (GG)
+      vector3 da, db;
+      double term6, term12, dE, term7, term13, rabSquared = 0.0;
++     OBMol *mol = a->GetParent();
++     OBUnitCell *uc = NULL;
++     double my_pos_a[3], my_pos_b[3];
++     
++     for(int c=0;c<3;c++) 
++       {
++ 	my_pos_a[c] = pos_a[c];
++ 	my_pos_b[c] = pos_b[c];
++       }
++     
++     // check the presence of a unit cell
++     if (mol->HasData(OBGenericDataType::UnitCell))
++       {
++ 	uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
++ 	
++ 	db.SetX(pos_b[0] - pos_a[0]);
++ 	db.SetY(pos_b[1] - pos_a[1]);
++ 	db.SetZ(pos_b[2] - pos_a[2]);
++ 
++ 	db = uc->MinimumImage(db);
++ 	for(int c=0;c<3;c++) 
++ 	  {
++ 	    my_pos_b[c] = db[c];
++ 	    my_pos_a[c] = 0.0;
++ 	  }
++       } 
+  
+      if (gradients) {
+!       
+!       rab = OBForceField::VectorDistanceDerivative(my_pos_a, my_pos_b,force_a, force_b);	
+!       if (rab < 1.0e-3) rab = 1.0e-3;	
+        rabSquared = SQUARE(rab);
++ 
+      } else {
+        // Get distance squared (saves a sqrt and multiply)
+        // for every energy evaluation
+        double ab[3];
++ 
+        for (unsigned int c = 0; c < 3; ++c)
+! 	rabSquared += SQUARE(my_pos_a[c] - my_pos_b[c]);
+!       
+!       // original line in the for loop was:
+!       // rabSquared += SQUARE(a->GetCoordinate()[c] - b->GetCoordinate()[c]);
+  
+        // make sure the energy doesn't blow up
+!       if (rabSquared < 1.0e-5) rabSquared = 1.0e-5;
+      }
+!     
+      // TODO: This actually should include zetas (not always exactly 6-12 for VDW paper)
+  
+      term6 = kaSquared / rabSquared; // ^2
+***************
+*** 442,448 ****
+      }
+    }
+  
+!   template<bool gradients>
+    double OBForceFieldUFF::E_VDW()
+    {
+      vector<OBFFVDWCalculationUFF>::iterator i;
+--- 608,614 ----
+      }
+    }
+  
+!   template<bool gradients> 
+    double OBForceFieldUFF::E_VDW()
+    {
+      vector<OBFFVDWCalculationUFF>::iterator i;
+***************
+*** 451,457 ****
+      IF_OBFF_LOGLVL_HIGH {
+        OBFFLog("\nV A N   D E R   W A A L S\n\n");
+        OBFFLog("ATOM TYPES\n");
+!       OBFFLog(" I    J        Rij       kij       ENERGY\n");
+        OBFFLog("-----------------------------------------\n");
+        //          XX   XX     -000.000  -000.000  -000.000  -000.000
+      }
+--- 617,623 ----
+      IF_OBFF_LOGLVL_HIGH {
+        OBFFLog("\nV A N   D E R   W A A L S\n\n");
+        OBFFLog("ATOM TYPES\n");
+!       OBFFLog(" I    J        sij       eij       ENERGY\n");
+        OBFFLog("-----------------------------------------\n");
+        //          XX   XX     -000.000  -000.000  -000.000  -000.000
+      }
+***************
+*** 472,485 ****
+        }
+  
+        IF_OBFF_LOGLVL_HIGH {
+!         snprintf(_logbuf, BUFF_SIZE, "%-5s %-5s %8.3f  %8.3f  %8.3f\n", (*i).a->GetType(), (*i).b->GetType(),
+!                  (*i).rab, (*i).kab, (*i).energy);
+          OBFFLog(_logbuf);
+        }
+      }
+  
+      IF_OBFF_LOGLVL_MEDIUM {
+!       snprintf(_logbuf, BUFF_SIZE, "     TOTAL VAN DER WAALS ENERGY = %8.3f %s\n", energy, GetUnit().c_str());
+        OBFFLog(_logbuf);
+      }
+  
+--- 638,652 ----
+        }
+  
+        IF_OBFF_LOGLVL_HIGH {
+!         snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u %8.3f  %8.3f  %8.4f\n", 
+!                  (*i).a->GetIdx(), (*i).b->GetIdx(),
+!                  (*i).ka, (*i).kab, (*i).energy);
+          OBFFLog(_logbuf);
+        }
+      }
+  
+      IF_OBFF_LOGLVL_MEDIUM {
+!       snprintf(_logbuf, BUFF_SIZE, "TOTAL VAN DER WAALS ENERGY = %8.3f %s\n", energy, GetUnit().c_str());
+        OBFFLog(_logbuf);
+      }
+  
+***************
+*** 494,505 ****
+--- 661,683 ----
+        return;
+      }
+  
++     // changed to consider the minimum image convention (GG)
+      vector3 da, db;
+      double dE, rab2;
++     OBMol *mol = a->GetParent();
++     OBUnitCell *uc;
+  
+      if (gradients) {
+        da = a->GetVector();
+        db = b->GetVector();
++ 
++       if (mol->HasData(OBGenericDataType::UnitCell))
++ 	{
++           uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
++           db = uc->MinimumImage(db-da);
++           da.Set(0.0, 0.0, 0.0);
++         }
++       
+        rab = OBForceField::VectorLengthDerivative(da, db);
+      } else
+        rab = a->GetDistance(b);
+***************
+*** 549,555 ****
+        }
+  
+        IF_OBFF_LOGLVL_HIGH {
+!         snprintf(_logbuf, BUFF_SIZE, "%-5s %-5s   %8.3f  %8.3f  %8.3f\n", (*i).a->GetType(), (*i).b->GetType(),
+                   (*i).rab, (*i).qq, (*i).energy);
+          OBFFLog(_logbuf);
+        }
+--- 727,733 ----
+        }
+  
+        IF_OBFF_LOGLVL_HIGH {
+!         snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u   %8.3f  %8.3f  %8.3f\n", (*i).a->GetIdx(), (*i).b->GetIdx(),
+                   (*i).rab, (*i).qq, (*i).energy);
+          OBFFLog(_logbuf);
+        }
+***************
+*** 1125,1130 ****
+--- 1303,1312 ----
+      double phi0 = 0.0;
+  
+      double vi, vj;
++     int equivalent_torsions;
++     OBAtom *b2, *c2;
++     OBTorsion *t2;
++ 
+      FOR_TORSIONS_OF_MOL(t, _mol) {
+        a = _mol.GetAtom((*t)[0] + 1);
+        b = _mol.GetAtom((*t)[1] + 1);
+***************
+*** 1148,1153 ****
+--- 1330,1344 ----
+            continue;
+        }
+  
++       // find equivalent torsions (GG)
++       equivalent_torsions = 0;
++       FOR_TORSIONS_OF_MOL(t2, _mol) {
++ 	b2 = _mol.GetAtom((*t2)[1] + 1);
++ 	c2 = _mol.GetAtom((*t2)[2] + 1);
++ 	if(((b2 == b) && (c2 == c)) ||
++ 	   ((b2 == c) && (c2 == b))) equivalent_torsions++;
++       }
++ 
+        OBBond *bc = _mol.GetBond(b, c);
+        torsiontype = bc->GetBondOrder();
+        if (bc->IsAromatic())
+***************
+*** 1256,1261 ****
+--- 1447,1454 ----
+  
+        // still need to implement special case of sp2-sp3 with sp2-sp2
+  
++       torsioncalc.V /= (double)equivalent_torsions;
++       torsioncalc.Phi0 = phi0; // need it for setting up the force field (GG)
+        torsioncalc.cosNPhi0 = cos(torsioncalc.n * DEG_TO_RAD * phi0);
+        torsioncalc.SetupPointers();
+        _torsioncalculations.push_back(torsioncalc);
+***************
+*** 1404,1446 ****
+      IF_OBFF_LOGLVL_LOW
+        OBFFLog("SETTING UP VAN DER WAALS CALCULATIONS...\n");
+  
+!     FOR_PAIRS_OF_MOL(p, _mol) {
+!       a = _mol.GetAtom((*p)[0]);
+!       b = _mol.GetAtom((*p)[1]);
+! 
+!       // skip this vdw if the atoms are ignored
+!       if ( _constraints.IsIgnored(a->GetIdx()) || _constraints.IsIgnored(b->GetIdx()) )
+!         continue;
+! 
+!       // if there are any groups specified, check if the two atoms are in a single _interGroup or if
+!       // two two atoms are in one of the _interGroups pairs.
+!       if (HasGroups()) {
+!         bool validVDW = false;
+!         for (unsigned int i=0; i < _interGroup.size(); ++i) {
+!           if (_interGroup[i].BitIsOn(a->GetIdx()) && _interGroup[i].BitIsOn(b->GetIdx()))
+!             validVDW = true;
+!         }
+!         for (unsigned int i=0; i < _interGroups.size(); ++i) {
+!           if (_interGroups[i].first.BitIsOn(a->GetIdx()) && _interGroups[i].second.BitIsOn(b->GetIdx()))
+!             validVDW = true;
+!           if (_interGroups[i].first.BitIsOn(b->GetIdx()) && _interGroups[i].second.BitIsOn(a->GetIdx()))
+!             validVDW = true;
+!         }
+! 
+!         if (!validVDW)
+!           continue;
+!       }
+! 
+!       if (a->IsConnected(b)) {
+!         continue;
+!       }
+!       if (a->IsOneThree(b)) {
+!         continue;
+!       }
+! 
+!       if (SetupVDWCalculation(a, b, vdwcalc)) {
+!         _vdwcalculations.push_back(vdwcalc);
+        }
+      }
+  
+      // NOTE: No electrostatics are set up
+--- 1597,1649 ----
+      IF_OBFF_LOGLVL_LOW
+        OBFFLog("SETTING UP VAN DER WAALS CALCULATIONS...\n");
+  
+!     // GG had a problem here. For large systems (> 1000 atoms), the
+!     // memory requirements for setting up vdW calculations can exceed
+!     // many GB. Since I DO need such large systems in obgmx, I skip
+!     // this assignment.
+! 
+!     if(_mol.NumAtoms() < 1000) {
+!       
+!       FOR_PAIRS_OF_MOL(p, _mol) {
+! 	a = _mol.GetAtom((*p)[0]);
+! 	b = _mol.GetAtom((*p)[1]);
+! 	
+! 	// skip this vdw if the atoms are ignored
+! 	if ( _constraints.IsIgnored(a->GetIdx()) || _constraints.IsIgnored(b->GetIdx()) )
+! 	  continue;
+! 	
+! 	// if there are any groups specified, check if the two atoms are in a single _interGroup or if
+! 	// two two atoms are in one of the _interGroups pairs.
+! 	if (HasGroups()) {
+! 	  bool validVDW = false;
+! 	  for (unsigned int i=0; i < _interGroup.size(); ++i) {
+! 	    if (_interGroup[i].BitIsOn(a->GetIdx()) && _interGroup[i].BitIsOn(b->GetIdx()))
+! 	      validVDW = true;
+! 	  }
+! 	  for (unsigned int i=0; i < _interGroups.size(); ++i) {
+! 	    if (_interGroups[i].first.BitIsOn(a->GetIdx()) && _interGroups[i].second.BitIsOn(b->GetIdx()))
+! 	      validVDW = true;
+! 	    if (_interGroups[i].first.BitIsOn(b->GetIdx()) && _interGroups[i].second.BitIsOn(a->GetIdx()))
+! 	      validVDW = true;
+! 	  }
+! 	  
+! 	  if (!validVDW)
+! 	    continue;
+! 	}
+! 	
+! 	if (a->IsConnected(b)) {
+! 	  continue;
+! 	}
+! 	if (a->IsOneThree(b)) {
+! 	  continue;
+! 	}
+! 	
+! 	if (SetupVDWCalculation(a, b, vdwcalc)) {
+! 	  _vdwcalculations.push_back(vdwcalc);
+! 	}
+        }
++     } else {
++       OBFFLog("--- NOT DONE: TOO MANY ATOMS (>1000)\n");
+      }
+  
+      // NOTE: No electrostatics are set up
+***************
+*** 1840,1845 ****
+--- 2043,2049 ----
+  
+      return passed; // did we pass every single component?
+    }
++   
+  
+  } // end namespace OpenBabel
+  
+diff -cr openbabel-2.3.2/src/forcefields/forcefielduff.h openbabel-2.3.2-gg/src/forcefields/forcefielduff.h
+*** openbabel-2.3.2/src/forcefields/forcefielduff.h	2012-10-03 21:07:57.000000000 +0200
+--- openbabel-2.3.2-gg/src/forcefields/forcefielduff.h	2015-05-13 16:51:08.944424436 +0200
+***************
+*** 56,61 ****
+--- 56,62 ----
+        int n;
+        double tt; //torsiontype (i.e. b-c bond order)
+        double V, tor, cosNPhi0;
++       double Phi0;
+  
+        template<bool> void Compute();
+  
+***************
+*** 198,204 ****
+--- 199,436 ----
+  
+      //! Compare and print the numerical and analytical gradients
+      bool ValidateGradients();
++     
++     // Calculation of force-field parameters
++     // Redefinition of the virtual functions givin access to
++     // the force-field paramers
++     // (GG)
+  
++     // The number of different atom types
++     int NAtomTypes()
++     {
++       OBAtom *a;
++       string atype;
++       bool have_it;
++       vector<string>::iterator i;
++ 
++       if(_natomtypes) return _natomtypes;
++       
++       _atomtype.reserve(_mol.NumAtoms());
++       
++       FOR_ATOMS_OF_MOL(a,_mol) {
++         atype = a->GetType();
++         for(have_it = false, i = _atomtype.begin() ; i != _atomtype.end() ; ++i)
++           if(atype == (*i)) have_it = true;
++         
++         if(!have_it) _atomtype.push_back(atype);
++       }
++       
++       _natomtypes = _atomtype.size();
++       
++       return _natomtypes;
++     }
++ 
++     // the name of the n-th atom type
++     const char* TypeName(int n) {
++       if(_natomtypes) NAtomTypes();
++       return(_atomtype[n].c_str());
++     }
++ 
++     // the index of the atom type of a given atom
++     int AtomTypeAsNumber(int atom) {
++       OBAtom *a;
++       string atype;
++       vector<string>::iterator i;
++       int ret = 0;
++       
++       a = _mol.GetAtom(atom+1); // atom is supposed to start from zero
++       if(a) atype = a->GetType();
++       else { 
++ 	cout << "WARNING in AtomTypeAsNumber" << endl; 
++ 	cout << "Cannot find type of atom " << atom << endl;
++ 	return -1; 
++       }
++ 
++       for(i = _atomtype.begin() ; i != _atomtype.end() ; ++i, ++ret)
++ 	if(atype == (*i)) return ret;
++       
++       return ret;
++     }
++ 
++     // NON-BONDED TERMS
++     double LJEps(const char* name) 
++     {
++       OBFFParameter *parameter = GetParameterUFF(name, _ffparams);
++       return(parameter->_dpar[3] * KCAL_TO_KJ);
++     }
++ 
++     double LJSig(const char* name) 
++     {
++       OBFFParameter *parameter = GetParameterUFF(name, _ffparams);
++       return(parameter->_dpar[2] * pow(2.0,-1.0/6.0));
++     }
++ 
++     // BONDS
++     int NBonds() { return _bondcalculations.size(); }
++     int NBondParams() { return 3; } // bond-order; kb; r0
++     double BondParam(int bond, int parnum) {
++       double ret = 0.0;
++       OBFFBondCalculationUFF b = _bondcalculations[bond];
++       switch(parnum) {
++       case 0:
++ 	ret = b.bt;
++ 	break;
++       case 1:
++ 	ret = b.kb;
++ 	break;
++       case 2:
++ 	ret = b.r0;
++ 	break;
++       }
++       return ret;
++     }
++     int BondAtomIdx(int bond, int which) {
++       int ret = -1;
++       OBFFBondCalculationUFF b = _bondcalculations[bond];
++       switch(which) {
++       case 0:
++ 	ret = b.a->GetIdx();
++ 	break;
++       case 1:
++ 	ret = b.b->GetIdx();
++ 	break;
++       }
++       return ret; 
++     }
++ 
++ 
++     // ANGLES
++     int NAngles() { return _anglecalculations.size(); }
++     int NAngleParams() { return 5; } // coord, ka, c0, c1, c2
++     double AngleParam(int angle, int parnum) {
++       double ret = 0.0;
++       OBFFAngleCalculationUFF a = _anglecalculations[angle];
++       switch(parnum) {
++       case 0:
++         ret = a.coord;
++         break;
++       case 1:
++         ret = a.ka;
++         break;
++       case 2:
++         ret = a.c0;
++         break;
++       case 3:
++         ret = a.c1;
++         break;
++       case 4:
++         ret = a.c2;
++         break;
++       }
++       return ret;
++     }
++     int AngleAtomIdx(int angle, int which) {
++       int ret = -1;
++       OBFFAngleCalculationUFF a = _anglecalculations[angle];
++       switch(which) {
++       case 0:
++ 	ret = a.a->GetIdx();
++ 	break;
++       case 1:
++ 	ret = a.b->GetIdx();
++ 	break;
++       case 2:
++ 	ret = a.c->GetIdx();
++ 	break;
++       }
++       return ret; 
++     }
++ 
++     // TORSIONS
++     int NTorsions() { return _torsioncalculations.size(); }
++     int NTorsionParams() { return 3; } // V, Phi0, n
++     double TorsionParam(int tors, int parnum) {
++       double ret = 0.0;
++       OBFFTorsionCalculationUFF t = _torsioncalculations[tors];
++       switch(parnum) {
++       case 0:
++         ret = t.V;
++         break;
++       case 1:
++         ret = t.Phi0;
++         break;
++       case 2:
++         ret = t.n;
++         break;
++       }
++       return ret;
++     }
++     
++     int TorsionAtomIdx(int tors, int which) {
++       int ret = -1;
++       OBFFTorsionCalculationUFF t = _torsioncalculations[tors];
++       switch(which) {
++       case 0:
++ 	ret = t.a->GetIdx();
++ 	break;
++       case 1:
++ 	ret = t.b->GetIdx();
++ 	break;
++       case 2:
++ 	ret = t.c->GetIdx();
++ 	break;
++       case 3:
++ 	ret = t.d->GetIdx();
++ 	break;
++       }
++       return ret; 
++     }
++ 
++     // INVERSIONS
++     int NInversions() { return _oopcalculations.size(); }
++     int NInversionParams() { return 4; } // 
++     double InversionParam(int inv, int parnum) {
++       double ret = 0.0;
++       OBFFOOPCalculationUFF t = _oopcalculations[inv];
++       switch(parnum) {
++       case 0:
++ 	ret = t.koop;
++ 	break;
++       case 1:
++ 	ret = t.c0;
++ 	break;
++       case 2:
++ 	ret = t.c1;
++ 	break;
++       case 3:
++ 	ret = t.c2;
++ 	break;
++       }
++       return ret;
++     }
++ 
++     int InversionAtomIdx(int inv, int which) {
++       int ret = -1;
++       OBFFOOPCalculationUFF t = _oopcalculations[inv];
++       switch(which) {
++       case 0:
++ 	ret = t.a->GetIdx();
++ 	break;
++       case 1:
++ 	ret = t.b->GetIdx();
++ 	break;
++       case 2:
++ 	ret = t.c->GetIdx();
++ 	break;
++       case 3:
++ 	ret = t.d->GetIdx();
++ 	break;
++       }
++       return ret; 
++     }
++ 
++     // end of the part added by GG.
++     
+    }; // class OBForceFieldUFF
+  
+  }// namespace OpenBabel
+diff -cr openbabel-2.3.2/src/generic.cpp openbabel-2.3.2-gg/src/generic.cpp
+*** openbabel-2.3.2/src/generic.cpp	2012-10-03 21:08:15.000000000 +0200
+--- openbabel-2.3.2-gg/src/generic.cpp	2015-01-22 14:52:25.327005183 +0100
+***************
+*** 29,34 ****
+--- 29,36 ----
+  #include <openbabel/atomclass.h>
+  #include <openbabel/alias.h>
+  
++ #include <math.h>
++ 
+  using namespace std;
+  
+  namespace OpenBabel
+***************
+*** 401,406 ****
+--- 403,426 ----
+      return vector3(x, y, z);
+    }
+  
++   // Minimum Image Convention (GG)
++   vector3 OBUnitCell::MinimumImageFractional(vector3 frac)
++   {
++     double x = frac.x()-rint(frac.x());
++     double y = frac.y()-rint(frac.y());
++     double z = frac.z()-rint(frac.z());
++     return vector3(x, y, z);
++ 
++   }
++ 
++   vector3 OBUnitCell::MinimumImage(vector3 cart)
++   {
++     vector3 v = CartesianToFractional(cart);
++     v = MinimumImageFractional(v);
++     return FractionalToCartesian(v);
++   }
++ 
++ 
+    OBUnitCell::LatticeType OBUnitCell::GetLatticeType( int spacegroup )
+    {
+      //	1-2 	Triclinic
+diff -cr openbabel-2.3.2/src/molchrg.cpp openbabel-2.3.2-gg/src/molchrg.cpp
+*** openbabel-2.3.2/src/molchrg.cpp	2010-10-10 04:05:19.000000000 +0200
+--- openbabel-2.3.2-gg/src/molchrg.cpp	2015-01-22 14:52:25.327005183 +0100
+***************
+*** 284,289 ****
+--- 284,434 ----
+          val[0] = 1.06;
+          val[1] = 5.47;
+          val[2] = 11.65;
++         // from http://mgltools.scripps.edu/api/PyBabel/PyBabel.gasteiger-pysrc.html
++ 	// GG
++         if(atom->GetHyb() == 3) {
++           val[0] = 1.29;
++           val[1] = 5.375;
++           val[2] = 11.195;
++         }
++         if(atom->GetHyb() == 2) {
++           val[0] = 1.47;
++           val[1] = 5.795;
++           val[2] = 11.51;
++         }
++         break;
++       case 5: //B
++         // from http://mgltools.scripps.edu/api/PyBabel/PyBabel.gasteiger-pysrc.html
++ 	// GG
++         if(atom->GetHyb() == 3) {
++           val[0] = 0.765;
++           val[1] = 5.98;
++           val[2] = 14.405;
++         }
++         if(atom->GetHyb() == 2) {
++           val[0] = 0.935;
++           val[1] = 6.42;
++           val[2] = 14.55;
++         }
++         break;
++       case 14: //Si
++         // from http://mgltools.scripps.edu/api/PyBabel/PyBabel.gasteiger-pysrc.html
++ 	// GG
++         if(atom->GetHyb() == 3) {
++           val[0] = 1.39;
++           val[1] = 7.3;
++           val[2] = 14.525;
++         }
++         if(atom->GetHyb() == 2) {
++           val[0] = 1.6;
++           val[1] = 7.905;
++           val[2] = 15.095;
++         }
++         if(atom->GetHyb() == 1) {
++           val[0] = 2.035;
++           val[1] = 9.065;
++           val[2] = 16.09;
++         }
++         break;
++       case 12: //Mg
++         // from http://mgltools.scripps.edu/api/PyBabel/PyBabel.gasteiger-pysrc.html
++ 	// GG
++         if(atom->GetHyb() == 3) {
++           val[0] = 0.16;
++           val[1] = 3.3;
++           val[2] = 11.335;
++         }
++         if(atom->GetHyb() == 2) {
++           val[0] = 0.19;
++           val[1] = 3.565;
++           val[2] = 11.335;
++         }
++         if(atom->GetHyb() == 1) {
++           val[0] = 0.39;
++           val[1] = 4.04;
++           val[2] = 11.335;
++         }
++         break;
++       case 4: // Be
++         // from http://mgltools.scripps.edu/api/PyBabel/PyBabel.gasteiger-pysrc.html
++         // GG
++ 	if(atom->GetHyb() == 3) {
++           val[0] = 0.255;
++           val[1] = 3.845;
++           val[2] = 13.765;
++         }
++         if(atom->GetHyb() == 2) {
++           val[0] = 0.315;
++           val[1] = 4.005;
++           val[2] = 13.765;
++         }
++         break;
++       case 26: // Fe
++         // ionization potentials from 
++         // http://en.wikipedia.org/wiki/Ionization_energies_of_the_elements_(data_page)
++         // electron affinity from
++         // http://en.wikipedia.org/wiki/Electron_affinity_(data_page)
++         // assuming 2nd electron affinity is 1.5 the first        
++ 	// GG
++         val[0] = 0.075500;
++         val[1] = 4.026700;
++         val[2] = 8.207150;
++         break;
++       case 27: // Co
++         // ionization potentials from 
++         // http://en.wikipedia.org/wiki/Ionization_energies_of_the_elements_(data_page)
++         // electron affinity from
++         // http://en.wikipedia.org/wiki/Electron_affinity_(data_page)
++         // assuming 2nd electron affinity is 1.5 the first
++ 	// GG
++         val[0] = 0.33165;
++         val[1] = 4.27215;
++         val[2] = 9.03897;
++         break;
++       case 28: // Ni
++         // ionization potentials from 
++         // http://en.wikipedia.org/wiki/Ionization_energies_of_the_elements_(data_page)
++         // electron affinity from
++         // http://en.wikipedia.org/wiki/Electron_affinity_(data_page)
++         // assuming 2nd electron affinity is 1.5 the first
++ 	// GG
++         val[0] = 0.57858;
++         val[1] = 4.39848;
++         val[2] = 9.95229;
++         break;
++       case 29: // Cu
++         // ionization potentials from 
++         // http://en.wikipedia.org/wiki/Ionization_energies_of_the_elements_(data_page)
++         // electron affinity from
++         // http://en.wikipedia.org/wiki/Electron_affinity_(data_page)
++         // assuming 2nd electron affinity is 1.5 the first
++ 	// GG
++         val[0] = 0.61789;
++         val[1] = 4.48108;
++         val[2] = 11.07304;
++         break;
++       case 30: // Zn
++         // First ionization: 9.3942 eV
++         // Second ionization: 17.96440 eV
++         // from http://en.wikipedia.org/wiki/Ionization_energies_of_the_elements_(data_page)
++         // First electron affinity: 1.138 eV
++         // Second electron affinity: 5.714 eV
++         // from DFT calculation (B3LYP & 6-31g**)
++ 	// GG
++         val[0] = 0.569;
++         val[1] = 5.266;
++         val[2] = 11.839;
++         break;
++       case 49: // In
++         // ionization potentials from 
++         // http://en.wikipedia.org/wiki/Ionization_energies_of_the_elements_(data_page)
++         // electron affinity from
++         // http://en.wikipedia.org/wiki/Electron_affinity_(data_page)
++         // assuming 2nd electron affinity is 1.5 the first        
++ 	// GG
++         val[0] = 0.19196;
++         val[1] = 3.08514;
++         val[2] = 9.72284;
+          break;
+        }
+  
+diff -cr openbabel-2.3.2/src/mol.cpp openbabel-2.3.2-gg/src/mol.cpp
+*** openbabel-2.3.2/src/mol.cpp	2012-10-03 21:08:15.000000000 +0200
+--- openbabel-2.3.2-gg/src/mol.cpp	2015-01-22 14:52:25.327005183 +0100
+***************
+*** 204,215 ****
+  	  return a->GetAngle( b, c );
+    }
+  
+    double OBMol::GetTorsion(int a,int b,int c,int d)
+    {
+!     return(CalcTorsionAngle(((OBAtom*)_vatom[a-1])->GetVector(),
+!                             ((OBAtom*)_vatom[b-1])->GetVector(),
+!                             ((OBAtom*)_vatom[c-1])->GetVector(),
+!                             ((OBAtom*)_vatom[d-1])->GetVector()));
+    }
+  
+    void OBMol::SetTorsion(OBAtom *a,OBAtom *b,OBAtom *c, OBAtom *d, double ang)
+--- 204,243 ----
+  	  return a->GetAngle( b, c );
+    }
+  
++ 
++   double OBMol::GetTorsion(OBAtom *a,OBAtom *b,OBAtom *c,OBAtom *d)
++   {
++ 
++     vector3 va = a->GetVector();
++     vector3 vb = b->GetVector();
++     vector3 vc = c->GetVector();
++     vector3 vd = d->GetVector();
++     
++     // use the minimum image convention (GG)
++     OBUnitCell *uc = NULL;
++     if (this->HasData(OBGenericDataType::UnitCell))
++       {
++ 	// use atom a as the origin of the coordinate system
++ 	uc = (OBUnitCell*)this->GetData(OBGenericDataType::UnitCell);
++ 	vb = uc->MinimumImage(vb-va);
++ 	vc = uc->MinimumImage(vc-va);
++ 	vd = uc->MinimumImage(vd-va);
++ 	va.Set(0.0, 0.0, 0.0);
++       }
++ 
++     return(CalcTorsionAngle(va, vb, vc, vd));
++   }
++ 
++ 
+    double OBMol::GetTorsion(int a,int b,int c,int d)
+    {
+!     // wrapper to the function above (GG)
+!     OBAtom *aa = (OBAtom*)_vatom[a-1];
+!     OBAtom *ab = (OBAtom*)_vatom[b-1];
+!     OBAtom *ac = (OBAtom*)_vatom[c-1];
+!     OBAtom *ad = (OBAtom*)_vatom[d-1];
+! 
+!     return(GetTorsion(aa,ab,ac,ad));
+    }
+  
+    void OBMol::SetTorsion(OBAtom *a,OBAtom *b,OBAtom *c, OBAtom *d, double ang)
+***************
+*** 329,342 ****
+    }
+  
+  
+-   double OBMol::GetTorsion(OBAtom *a,OBAtom *b,OBAtom *c,OBAtom *d)
+-   {
+-     return(CalcTorsionAngle(a->GetVector(),
+-                             b->GetVector(),
+-                             c->GetVector(),
+-                             d->GetVector()));
+-   }
+- 
+    void OBMol::ContigFragList(std::vector<std::vector<int> >&cfl)
+    {
+      int j;
+--- 357,362 ----
+***************
+*** 3406,3413 ****
+--- 3426,3440 ----
+      vector<double> rad;
+      vector<int> zsorted;
+      vector<int> bondCount; // existing bonds (e.g., from residues in PDB)
++     OBUnitCell *uc = NULL;
+  
+      double *c = new double [NumAtoms()*3];
++ 
++     // see if we are considering a periodic structure
++     // GG
++     if (HasData(OBGenericDataType::UnitCell))
++       uc = (OBUnitCell*)GetData(OBGenericDataType::UnitCell);
++ 
+      rad.resize(_natoms);
+  
+      for (j = 0, atom = BeginAtom(i) ; atom ; atom = NextAtom(i), ++j)
+***************
+*** 3429,3435 ****
+        }
+  
+      int idx1, idx2;
+!     double d2,cutoff,zd;
+      for (j = 0 ; j < max ; ++j)
+        {
+          idx1 = zsorted[j];
+--- 3456,3463 ----
+        }
+  
+      int idx1, idx2;
+!     double d2,cutoff2,zd;
+!     vector3 vec, vec_uc, vtmp;
+      for (j = 0 ; j < max ; ++j)
+        {
+          idx1 = zsorted[j];
+***************
+*** 3438,3454 ****
+              idx2 = zsorted[k];
+  
+              // bonded if closer than elemental Rcov + tolerance
+!             cutoff = SQUARE(rad[j] + rad[k] + 0.45);
+  
+!             zd  = SQUARE(c[idx1*3+2] - c[idx2*3+2]);
+!             if (zd > 25.0 )
+!               break; // bigger than max cutoff
+  
+!             d2  = SQUARE(c[idx1*3]   - c[idx2*3]);
+!             d2 += SQUARE(c[idx1*3+1] - c[idx2*3+1]);
+!             d2 += zd;
+  
+!             if (d2 > cutoff)
+                continue;
+              if (d2 < 0.40)
+                continue;
+--- 3466,3494 ----
+              idx2 = zsorted[k];
+  
+              // bonded if closer than elemental Rcov + tolerance
+!             cutoff2 = SQUARE(rad[j] + rad[k] + 0.45);
+  
+!             vec.Set(c[idx1*3]   - c[idx2*3],
+!                     c[idx1*3+1] - c[idx2*3+1],
+!                     c[idx1*3+2] - c[idx2*3+2]);
+!             
+! 	    // minimum image convention (GG)
+!             if(uc) {
+!               vec_uc = uc->MinimumImage(vec);
+! 	      //vtmp = vec_uc - vec;
+! 	      //if(vtmp.length_2() > 25.0) {
+! 	      //	cout << idx1 << " , " << idx2 << " : " << vec << " -> ";
+! 	      //	cout << vec_uc << endl;
+! 	      //}
+! 	      vec = vec_uc;
+!             }
+!             
+!             d2 = vec.length_2();
+  
+!             // let's check all the pairs, just to be sure.
+!             //if (d2 > 25.0 ) break; // bigger than max cutoff
+  
+!             if (d2 > cutoff2)
+                continue;
+              if (d2 < 0.40)
+                continue;
+***************
+*** 3456,3467 ****
+              atom = GetAtom(idx1+1);
+              nbr  = GetAtom(idx2+1);
+  
+!             if (atom->IsConnected(nbr))
+!               continue;
+!             if (atom->IsHydrogen() && nbr->IsHydrogen())
+!               continue;
+  
+!             AddBond(idx1+1,idx2+1,1);
+            }
+        }
+  
+--- 3496,3507 ----
+              atom = GetAtom(idx1+1);
+              nbr  = GetAtom(idx2+1);
+  
+!             if (atom->IsConnected(nbr)) continue;
+! 	    
+! 	    // we might actually have an H2 molecule, can't we? (GG)
+!             if (atom->IsHydrogen() && nbr->IsHydrogen() && d2 > 1.0) continue;
+  
+! 	    AddBond(idx1+1,idx2+1,1);
+            }
+        }
+  
+***************
+*** 3526,3533 ****
+                    }
+                }
+              DeleteBond(maxbond); // delete the new bond with the longest length
+!           }
+!       }
+  
+      if (unset)
+        {
+--- 3566,3574 ----
+                    }
+                }
+              DeleteBond(maxbond); // delete the new bond with the longest length
+!           } // while()...
+! 
+!       } // iteration on atoms
+  
+      if (unset)
+        {
+diff -cr openbabel-2.3.2/src/plugin.cpp openbabel-2.3.2-gg/src/plugin.cpp
+*** openbabel-2.3.2/src/plugin.cpp	2012-10-03 21:08:15.000000000 +0200
+--- openbabel-2.3.2-gg/src/plugin.cpp	2015-01-22 14:52:25.327005183 +0100
+***************
+*** 36,42 ****
+  
+  OBPlugin* OBPlugin::BaseFindType(PluginMapType& Map, const char* ID)
+  {
+!   if(!ID || !*ID)
+      return NULL;
+    PluginMapType::iterator itr = Map.find(ID);
+    if(itr==Map.end())
+--- 36,42 ----
+  
+  OBPlugin* OBPlugin::BaseFindType(PluginMapType& Map, const char* ID)
+  {
+!   if(!ID || !*ID) 
+      return NULL;
+    PluginMapType::iterator itr = Map.find(ID);
+    if(itr==Map.end())
+***************
+*** 335,340 ****
+--- 335,341 ----
+    plugin_ids.push_back(reinterpret_cast<OBPlugin*>(&theGasteigerCharges)->GetID());
+    plugin_ids.push_back(reinterpret_cast<OBPlugin*>(&theMMFF94Charges)->GetID());
+  #ifdef HAVE_EIGEN
++   // edited by GG
+    plugin_ids.push_back(reinterpret_cast<OBPlugin*>(&theQEqCharges)->GetID());
+    plugin_ids.push_back(reinterpret_cast<OBPlugin*>(&theQTPIECharges)->GetID());
+  #endif

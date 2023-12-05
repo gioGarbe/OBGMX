@@ -1,0 +1,44 @@
+#################
+# OBGMX RELEASE #
+#################
+(c) Giovanni Garberoglio, garberoglio@ectstar.eu
+
+OBGMX is a program that generates GROMACS topologies using the UFF force
+field, as implemented in OpenBabel 2.3.2.
+An online version, limited to 1000 atoms, runs on
+http://software-lisc.fbk.eu/obgmx/
+The executable provided here lifts this limitation.
+
+This directory should contain this file, a x86_64 executable
+(obgmx-release) build under Ubuntu 16.04 LTS, and a subdirectory called
+'share'
+
+Please create a directory named /usr/local/ob-gg-232 and copy 'share'
+there. Notice that on most systems you must have admin privileges to do
+that.
+
+Then run obgmx-release without any argument to see what the command-line
+options are. They correspond to the options on the website and are
+discussed in the original OBGMX paper, that you are welcome to cite:
+
+G. Garberoglio. OBGMX: a web-based generator of GROMACS topologies for
+molecular and periodic systems using the Universal Force
+Field. J. Comput. Chem. 33 (2012), 2204-2208
+http://dx.doi.org/10.1002/jcc.23049 
+
+----------
+DISCLAIMER
+----------
+OBGMX is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.
+
+-------
+LICENSE
+-------
+DO NOT REDISTRIBUTE.
+I am not sure about the licensing status of this software, since it is
+heavily based on OpenBabel 2.3.2, which is GPL
+Until I figure out what is the best way to proceed, use it only for
+research and academic purposes.
+Please direct all enquiries to garberoglio@ectstar.eu
