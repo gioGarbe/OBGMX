@@ -1,7 +1,7 @@
 # OBGMX
 A generator of GROMACS topologies using Openbabel's UFF force field.
 
-OBGMX is a set of patches to [openbabel-2.3.2](https://sourceforge.net/projects/openbabel/files/openbabel/2.3.2/openbabel-2.3.2.tar.gz/download) (`ob-gg-2.3.2.patch`), which enable dealing with periodic systems, and a program (`obgmx.cpp`) that uses openbabel's UFF implementation to generate [GROMACS](https://www.gromacs.org/) topologies.
+OBGMX is a set of patches to [openbabel-2.3.2](https://sourceforge.net/projects/openbabel/files/openbabel/2.3.2/openbabel-2.3.2.tar.gz/download) (`ob-2.3.2-gg-2025.patch`), which enable dealing with periodic systems, and a program (`obgmx.cpp`) that uses openbabel's UFF implementation to generate [GROMACS](https://www.gromacs.org/) topologies.
 
 The OBGMX project began with the goal of enabling molecular-dynamics simulations of flexible
 metal-organic frameworks. Since then, my research interest has drifted away from molecular
