@@ -9,8 +9,8 @@ simulations so **I can no longer maintain the code on a regular basis**.
 
 Nevertheless, I felt that I should somehow celebrate the [2025 Nobel prize in
 Chemistry](https://www.nobelprize.org/prizes/chemistry/2025/summary/), so I enlisted the help of an LLM
-and came up with a version of OBGMX that compiles on modern distributions, such as Ubuntu 24.04.3
-LTS or macOS Tahoe.
+and came up with a version of OBGMX that compiles on modern distributions, such as Ubuntu 24.04 LTS
+or macOS 26 Tahoe.
 
 The shell script `install_obgmx.sh` takes care of:
 
