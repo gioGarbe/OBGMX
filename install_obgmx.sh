@@ -2,7 +2,7 @@
 
 # directory where the patched OpenBabel will be installed
 # change as needed
-# you will need sudo access to this directory
+# you might need sudo access to this directory
 DEFAULT_OB_HOME=/usr/local/ob-gg-2.3.2
 
 # number of threads to use when building the library
