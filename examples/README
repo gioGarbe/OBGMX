@@ -1,0 +1,6 @@
+$ obgmx caffeine.xyz
+will produce obgmx.top and obgmx.itp for a model of the caffeine molecule.
+
+$ obgmx IRMOF-1.pdb
+will produce obgmx.top and obgmx.itp for the unit cell of the IRMOF-1 metal-organic framework.
+The topology will have connections between periodic images of the atoms along the unit cell.
