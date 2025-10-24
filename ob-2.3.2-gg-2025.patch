@@ -1,0 +1,4296 @@
+diff -urN openbabel-2.3.2/CMakeLists.txt openbabel-2.3.2-gg/CMakeLists.txt
+--- openbabel-2.3.2/CMakeLists.txt	2012-10-03 21:08:58.000000000 +0200
++++ openbabel-2.3.2-gg/CMakeLists.txt	2025-10-24 14:27:45.497937550 +0200
+@@ -233,6 +233,18 @@
+   macro_ensure_version("4.2.0" "${_gcc_version}" GCC_IS_NEWER_THAN_4_2)
+ endif()
+ 
++# better check for compiler version (GG 2025-10-24)
++if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")     # Only do it for GNU
++  # CMAKE_CXX_COMPILER_VERSION is a string like “4.8.5” or “10.2.1”
++  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.0.0)
++    set(GCC_IS_NEWER_THAN_4_0 TRUE CACHE BOOL
++        "GCC version is newer than 4.0.0 (i.e. >4.0.0)")
++  else()
++    set(GCC_IS_NEWER_THAN_4_0 FALSE CACHE BOOL
++        "GCC version is older or equal to 4.0.0")
++  endif()
++endif()
++
+ if(UNIX)
+   option(ENABLE_SYMBOL_VISIBILITY
+     "Enable support for compiler symbol visibility. WARNING: Some issues reported"
+diff -urN openbabel-2.3.2/data/element.txt openbabel-2.3.2-gg/data/element.txt
+--- openbabel-2.3.2/data/element.txt	2012-10-03 21:08:56.000000000 +0200
++++ openbabel-2.3.2-gg/data/element.txt	2025-10-24 12:13:34.525445889 +0200
+@@ -40,11 +40,11 @@
+ 5	B	2.01	0.84	0.84	1.92	4	10.811	2.04	8.298	0.279723	1.00	0.71	0.71	Boron
+ 6	C	2.50	0.76	0.76	1.70	4	12.0107	2.55	11.2603	1.262118	0.40	0.40	0.40	Carbon
+ 7	N	3.07	0.71	0.71	1.55	4	14.0067	3.04	14.5341	-0.07	0.05	0.05	1.00	Nitrogen
+-8	O	3.50	0.66	0.66	1.52	2	15.9994	3.44	13.6181	1.461112	1.00	0.05	0.05	Oxygen
++8	O	3.50	0.66	0.66	1.52	4	15.9994	3.44	13.6181	1.461112	1.00	0.05	0.05	Oxygen
+ 9	F	4.10	0.57	0.57	1.47	1	18.9984032	3.98	17.4228	3.4011887	0.50	0.70	1.00	Fluorine
+ 10	Ne	0.00	0.58	0.58	1.54	0	20.1797	0.00	21.5645	0	0.70	0.89	0.96	Neon
+ 11	Na	1.01	1.66	1.66	2.27	1	22.98977	0.93	5.1391	0.547926	0.67	0.36	0.95	Sodium
+-12	Mg	1.23	1.41	1.41	1.73	2	24.3050	1.31	7.6462	0	0.54	1.00	0.00	Magnesium
++12	Mg	1.23	1.41	1.41	1.73	6	24.3050	1.31	7.6462	0	0.54	1.00	0.00	Magnesium
+ 13	Al	1.47	1.21	1.21	1.84	6	26.981538	1.61	5.9858	0.43283	0.75	0.65	0.65	Aluminium
+ 14	Si	1.74	1.11	1.11	2.10	6	28.0855	1.90	8.1517	1.389521	0.50	0.60	0.60	Silicon
+ 15	P	2.06	1.07	1.07	1.80	6	30.973761	2.19	10.4867	0.7465	1.00	0.50	0.00	Phosphorus
+diff -urN openbabel-2.3.2/data/UFF.prm openbabel-2.3.2-gg/data/UFF.prm
+--- openbabel-2.3.2/data/UFF.prm	2011-09-15 21:20:40.000000000 +0200
++++ openbabel-2.3.2-gg/data/UFF.prm	2025-10-24 12:13:34.525445889 +0200
+@@ -14,7 +14,7 @@
+ #  of the type rule (i.e., generic rules first, more specific rules later)
+ #
+ # Parameters follow later
+-# param Atom	r1	theta0	x1	D1	zeta	Z1	Vi	Uj	Xi	Hard	Radius
++# param Atom    r1  theta0  x1  D1  zeta    Z1  Vi  Uj  Xi  Hard    Radius
+ 
+ #atom [#0]     Du          Dummy atom (e.g., ligand attachment point)
+ atom [#1]     H_          Generic hydrogen
+@@ -29,20 +29,32 @@
+ atom [C^1]    C_1         sp hybridized C
+ atom [c]      C_R         aromatic C
+ atom [#6H1D3r5] C_R       aromatic C (cyclopentadienyl ring)
++## added by GG to make ZIF-8 come out right
++atom [#6D3r5] C_R         carbon in 5-membered ring, with 3 neighbors and no H's
++atom  [$([#6D3]([OX2])([OX2])[#6])] C_R  [C-(O2C)] in IRMOF
++###
+ atom [#7]     N_3         Generic sp3 N
+ atom [N^2]    N_2         sp2 non-aromatic N
+ atom [N^1]    N_1         sp hybridized N
+ atom [n]      N_R         aromatic N
++## added by GG to make ZIF-8 come out right
++atom [#7X3r5] N_R         nitrogen in 5-membered ring, with 3 neighbors
+ atom [#8]     O_3         generic, sp3 hybridized O
+ atom [#8][#14] O_3_z      sp3 hybridized O for zeolites
+ atom [O^2]    O_2         sp2 hybridized O
+ atom [O^1]    O_1         sp hybridized O
+ atom [o]      O_R         aromatic O
++## added by GG to make IRMOFs come out right
++atom [#8X4]   O_3_f       UFF4MOF
++atom [#8X3]   O_2_z       UFF4MOF
+ atom [#9]     F_          generic F
+ atom [#10]    Ne4+4
+ atom [#11]    Na
+ atom [#12]    Mg3+2
++# octahedral Mg found in some MOFs
++atom [#12X6]  Mg6
+ atom [#13]    Al3
++atom [#13X6]  Al6+3       UFF4MOF
+ atom [#14]    Si3
+ #atom [#15]   P_3+q       Organometallic phosphine ligands
+ atom [#15]    P_3+3       generic phosphorus
+@@ -57,17 +69,32 @@
+ atom [#19]    K_
+ atom [#20]    Ca6+2
+ atom [#21]    Sc3+3
++atom [#21X6]  Sc6+3       UFF4MOF
+ atom [#22]    Ti6+4       generic Ti (6-valent)
+ atom [#22D3]  Ti3+4
++atom [#22X4]  Ti4+2       UFF4MOF
+ atom [#23]    V_3+5
++atom [#23X4]  V_4+2       UFF4MOF
++atom [#23X6]  V_6+3       UFF4MOF
+ atom [#24]    Cr6+3
++atom [#24X4]  Cr4+2       UFF4MOF
++atom [#24X6]  Cr6f3       UFF4MOF
+ atom [#25]    Mn6+2
++atom [#25X6]  Mn6+3       UFF4MOF
++atom [#25X4]  Mn4+2       UFF4MOF
+ atom [#26]    Fe6+2       generic Fe (6-valent)
+ atom [#26D3]  Fe3+2
++atom [#26X6]  Fe6+3       UFF4MOF
++atom [#26X4]  Fe4+2       UFF4MOF
+ atom [#27]    Co6+3
++atom [#27X4]  Co3+2       UFF4MOF
++atom [#27D4]  Co4+2       UFF4MOF
+ atom [#28]    Ni4+2
+ atom [#29]    Cu3+1
++atom [#29X4]  Cu4+2       UFF4MOF
+ atom [#30]    Zn3+2
++atom [#30X4]  Zn4+2       UFF4MOF
++atom [#30X4]  Zn3f2       UFF4MOF
+ atom [#31]    Ga3+3
+ atom [#32]    Ge3
+ atom [#33]    As3+3
+@@ -146,132 +173,151 @@
+ atom [#102]    No6+3
+ atom [#103]    Lw6+3
+ 
+-# Atom          r1	theta0	x1	D1	zeta	Z1	Vi	Uj	Xi	Hard	Radius
+-param Du  0.01   180 0.4 5000 12	10.0	0 0 9.66	14.92	0.7
+-param H_	0.354	180	2.886	0.044	12	0.712	0	0	4.528	6.9452	0.371
+-param H_b	0.46	83.5	2.886	0.044	12	0.712	0	0	4.528	6.9452	0.371
+-param He4+4	0.849	90	2.362	0.056	15.24	0.098	0	0	9.66	14.92	1.3
+-param Li	1.336	180	2.451	0.025	12	1.026	0	2	3.006	2.386	1.557
+-param Be3+2	1.074	109.47	2.745	0.085	12	1.565	0	2	4.877	4.443	1.24
+-param B_3	0.838	109.47	4.083	0.18	12.052	1.755	0	2	5.11	4.75	0.822
+-param B_2	0.828	120	4.083	0.18	12.052	1.755	0	2	5.11	4.75	0.822
+-param C_3	0.757	109.47	3.851	0.105	12.73	1.912	2.119	2	5.343	5.063	0.759
+-param C_R	0.729	120	3.851	0.105	12.73	1.912	0	2	5.343	5.063	0.759
+-param C_2	0.732	120	3.851	0.105	12.73	1.912	0	2	5.343	5.063	0.759
+-param C_1	0.706	180	3.851	0.105	12.73	1.912	0	2	5.343	5.063	0.759
+-param N_3	0.7	106.7	3.66	0.069	13.407	2.544	0.45	2	6.899	5.88	0.715
+-param N_R	0.699	120	3.66	0.069	13.407	2.544	0	2	6.899	5.88	0.715
+-param N_2	0.685	111.2	3.66	0.069	13.407	2.544	0	2	6.899	5.88	0.715
+-param N_1	0.656	180	3.66	0.069	13.407	2.544	0	2	6.899	5.88	0.715
+-param O_3	0.658	104.51	3.5	0.06	14.085	2.3	0.018	2	8.741	6.682	0.669
+-param O_3_z	0.528	146	3.5	0.06	14.085	2.3	0.018	2	8.741	6.682	0.669
+-param O_R	0.68	110	3.5	0.06	14.085	2.3	0	2	8.741	6.682	0.669
+-param O_2	0.634	120	3.5	0.06	14.085	2.3	0	2	8.741	6.682	0.669
+-param O_1	0.639	180	3.5	0.06	14.085	2.3	0	2	8.741	6.682	0.669
+-param F_	0.668	180	3.364	0.05	14.762	1.735	0	2	10.874	7.474	0.706
+-param Ne4+4	0.92	90	3.243	0.042	15.44	0.194	0	2	11.04	10.55	1.768
+-param Na	1.539	180	2.983	0.03	12	1.081	0	1.25	2.843	2.296	2.085
+-param Mg3+2	1.421	109.47	3.021	0.111	12	1.787	0	1.25	3.951	3.693	1.5
+-param Al3	1.244	109.47	4.499	0.505	11.278	1.792	0	1.25	4.06	3.59	1.201
+-param Si3	1.117	109.47	4.295	0.402	12.175	2.323	1.225	1.25	4.168	3.487	1.176
+-param P_3+3	1.101	93.8	4.147	0.305	13.072	2.863	2.4	1.25	5.463	4	1.102
+-param P_3+5	1.056	109.47	4.147	0.305	13.072	2.863	2.4	1.25	5.463	4	1.102
+-param P_3+q	1.056	109.47	4.147	0.305	13.072	2.863	2.4	1.25	5.463	4	1.102
+-param S_3+2	1.064	92.1	4.035	0.274	13.969	2.703	0.484	1.25	6.928	4.486	1.047
+-param S_3+4	1.049	103.2	4.035	0.274	13.969	2.703	0.484	1.25	6.928	4.486	1.047
+-param S_3+6	1.027	109.47	4.035	0.274	13.969	2.703	0.484	1.25	6.928	4.486	1.047
+-param S_R	1.077	92.2	4.035	0.274	13.969	2.703	0	1.25	6.928	4.486	1.047
+-param S_2	0.854	120	4.035	0.274	13.969	2.703	0	1.25	6.928	4.486	1.047
+-param Cl	1.044	180	3.947	0.227	14.866	2.348	0	1.25	8.564	4.946	0.994
+-param Ar4+4	1.032	90	3.868	0.185	15.763	0.3	0	1.25	9.465	6.355	2.108
+-param K_	1.953	180	3.812	0.035	12	1.165	0	0.7	2.421	1.92	2.586
+-param Ca6+2	1.761	90	3.399	0.238	12	2.141	0	0.7	3.231	2.88	2
+-param Sc3+3	1.513	109.47	3.295	0.019	12	2.592	0	0.7	3.395	3.08	1.75
+-param Ti3+4	1.412	109.47	3.175	0.017	12	2.659	0	0.7	3.47	3.38	1.607
+-param Ti6+4	1.412	90	3.175	0.017	12	2.659	0	0.7	3.47	3.38	1.607
+-param V_3+5	1.402	109.47	3.144	0.016	12	2.679	0	0.7	3.65	3.41	1.47
+-param Cr6+3	1.345	90	3.023	0.015	12	2.463	0	0.7	3.415	3.865	1.402
+-param Mn6+2	1.382	90	2.961	0.013	12	2.43	0	0.7	3.325	4.105	1.533
+-param Fe3+2	1.27	109.47	2.912	0.013	12	2.43	0	0.7	3.76	4.14	1.393
+-param Fe6+2	1.335	90	2.912	0.013	12	2.43	0	0.7	3.76	4.14	1.393
+-param Co6+3	1.241	90	2.872	0.014	12	2.43	0	0.7	4.105	4.175	1.406
+-param Ni4+2	1.164	90	2.834	0.015	12	2.43	0	0.7	4.465	4.205	1.398
+-param Cu3+1	1.302	109.47	3.495	0.005	12	1.756	0	0.7	4.2	4.22	1.434
+-param Zn3+2	1.193	109.47	2.763	0.124	12	1.308	0	0.7	5.106	4.285	1.4
+-param Ga3+3	1.26	109.47	4.383	0.415	11	1.821	0	0.7	3.641	3.16	1.211
+-param Ge3	1.197	109.47	4.28	0.379	12	2.789	0.701	0.7	4.051	3.438	1.189
+-param As3+3	1.211	92.1	4.23	0.309	13	2.864	1.5	0.7	5.188	3.809	1.204
+-param Se3+2	1.19	90.6	4.205	0.291	14	2.764	0.335	0.7	6.428	4.131	1.224
+-param Br	1.192	180	4.189	0.251	15	2.519	0	0.7	7.79	4.425	1.141
+-param Kr4+4	1.147	90	4.141	0.22	16	0.452	0	0.7	8.505	5.715	2.27
+-param Rb	2.26	180	4.114	0.04	12	1.592	0	0.2	2.331	1.846	2.77
+-param Sr6+2	2.052	90	3.641	0.235	12	2.449	0	0.2	3.024	2.44	2.415
+-param Y_3+3	1.698	109.47	3.345	0.072	12	3.257	0	0.2	3.83	2.81	1.998
+-param Zr3+4	1.564	109.47	3.124	0.069	12	3.667	0	0.2	3.4	3.55	1.758
+-param Nb3+5	1.473	109.47	3.165	0.059	12	3.618	0	0.2	3.55	3.38	1.603
+-param Mo6+6	1.467	90	3.052	0.056	12	3.4	0	0.2	3.465	3.755	1.53
+-param Mo3+6	1.484	109.47	3.052	0.056	12	3.4	0	0.2	3.465	3.755	1.53
+-param Tc6+5	1.322	90	2.998	0.048	12	3.4	0	0.2	3.29	3.99	1.5
+-param Ru6+2	1.478	90	2.963	0.056	12	3.4	0	0.2	3.575	4.015	1.5
+-param Rh6+3	1.332	90	2.929	0.053	12	3.5	0	0.2	3.975	4.005	1.509
+-param Pd4+2	1.338	90	2.899	0.048	12	3.21	0	0.2	4.32	4	1.544
+-param Ag1+1	1.386	180	3.148	0.036	12	1.956	0	0.2	4.436	3.134	1.622
+-param Cd3+2	1.403	109.47	2.848	0.228	12	1.65	0	0.2	5.034	3.957	1.6
+-param In3+3	1.459	109.47	4.463	0.599	11	2.07	0	0.2	3.506	2.896	1.404
+-param Sn3	1.398	109.47	4.392	0.567	12	2.961	0.199	0.2	3.987	3.124	1.354
+-param Sb3+3	1.407	91.6	4.42	0.449	13	2.704	1.1	0.2	4.899	3.342	1.404
+-param Te3+2	1.386	90.25	4.47	0.398	14	2.882	0.3	0.2	5.816	3.526	1.38
+-param I_	1.382	180	4.5	0.339	15	2.65	0	0.2	6.822	3.762	1.333
+-param Xe4+4	1.267	90	4.404	0.332	12	0.556	0	0.2	7.595	4.975	2.459
+-param Cs	2.57	180	4.517	0.045	12	1.573	0	0.1	2.183	1.711	2.984
+-param Ba6+2	2.277	90	3.703	0.364	12	2.727	0	0.1	2.814	2.396	2.442
+-param La3+3	1.943	109.47	3.522	0.017	12	3.3	0	0.1	2.8355	2.7415	2.071
+-param Ce6+3	1.841	90	3.556	0.013	12	3.3	0	0.1	2.774	2.692	1.925
+-param Pr6+3	1.823	90	3.606	0.01	12	3.3	0	0.1	2.858	2.564	2.007
+-param Nd6+3	1.816	90	3.575	0.01	12	3.3	0	0.1	2.8685	2.6205	2.007
+-param Pm6+3	1.801	90	3.547	0.009	12	3.3	0	0.1	2.881	2.673	2
+-param Sm6+3	1.78	90	3.52	0.008	12	3.3	0	0.1	2.9115	2.7195	1.978
+-param Eu6+3	1.771	90	3.493	0.008	12	3.3	0	0.1	2.8785	2.7875	2.227
+-param Gd6+3	1.735	90	3.368	0.009	12	3.3	0	0.1	3.1665	2.9745	1.968
+-param Tb6+3	1.732	90	3.451	0.007	12	3.3	0	0.1	3.018	2.834	1.954
+-param Dy6+3	1.71	90	3.428	0.007	12	3.3	0	0.1	3.0555	2.8715	1.934
+-param Ho6+3	1.696	90	3.409	0.007	12	3.416	0	0.1	3.127	2.891	1.925
+-param Er6+3	1.673	90	3.391	0.007	12	3.3	0	0.1	3.1865	2.9145	1.915
+-param Tm6+3	1.66	90	3.374	0.006	12	3.3	0	0.1	3.2514	2.9329	2
+-param Yb6+3	1.637	90	3.355	0.228	12	2.618	0	0.1	3.2889	2.965	2.158
+-param Lu6+3	1.671	90	3.64	0.041	12	3.271	0	0.1	2.9629	2.4629	1.896
+-param Hf3+4	1.611	109.47	3.141	0.072	12	3.921	0	0.1	3.7	3.4	1.759
+-param Ta3+5	1.511	109.47	3.17	0.081	12	4.075	0	0.1	5.1	2.85	1.605
+-param W_6+6	1.392	90	3.069	0.067	12	3.7	0	0.1	4.63	3.31	1.538
+-param W_3+4	1.526	109.47	3.069	0.067	12	3.7	0	0.1	4.63	3.31	1.538
+-param W_3+6	1.38	109.47	3.069	0.067	12	3.7	0	0.1	4.63	3.31	1.538
+-param Re6+5	1.372	90	2.954	0.066	12	3.7	0	0.1	3.96	3.92	1.6
+-param Re3+7	1.314	109.47	2.954	0.066	12	3.7	0	0.1	3.96	3.92	1.6
+-param Os6+6	1.372	90	3.12	0.037	12	3.7	0	0.1	5.14	3.63	1.7
+-param Ir6+3	1.371	90	2.84	0.073	12	3.731	0	0.1	5	4	1.866
+-param Pt4+2	1.364	90	2.754	0.08	12	3.382	0	0.1	4.79	4.43	1.557
+-param Au4+3	1.262	90	3.293	0.039	12	2.625	0	0.1	4.894	2.586	1.618
+-param Hg1+2	1.34	180	2.705	0.385	12	1.75	0	0.1	6.27	4.16	1.6
+-param Tl3+3	1.518	120	4.347	0.68	11	2.068	0	0.1	3.2	2.9	1.53
+-param Pb3	1.459	109.47	4.297	0.663	12	2.846	0.1	0.1	3.9	3.53	1.444
+-param Bi3+3	1.512	90	4.37	0.518	13	2.47	1	0.1	4.69	3.74	1.514
+-param Po3+2	1.5	90	4.709	0.325	14	2.33	0.3	0.1	4.21	4.21	1.48
+-param At	1.545	180	4.75	0.284	15	2.24	0	0.1	4.75	4.75	1.47
+-param Rn4+4	1.42	90	4.765	0.248	16	0.583	0	0.1	5.37	5.37	2.2
+-param Fr	2.88	180	4.9	0.05	12	1.847	0	0	2	2	2.3
+-param Ra6+2	2.512	90	3.677	0.404	12	2.92	0	0	2.843	2.434	2.2
+-param Ac6+3	1.983	90	3.478	0.033	12	3.9	0	0	2.835	2.835	2.108
+-param Th6+4	1.721	90	3.396	0.026	12	4.202	0	0	3.175	2.905	2.018
+-param Pa6+4	1.711	90	3.424	0.022	12	3.9	0	0	2.985	2.905	1.8
+-param U_6+4	1.684	90	3.395	0.022	12	3.9	0	0	3.341	2.853	1.713
+-param Np6+4	1.666	90	3.424	0.019	12	3.9	0	0	3.549	2.717	1.8
+-param Pu6+4	1.657	90	3.424	0.016	12	3.9	0	0	3.243	2.819	1.84
+-param Am6+4	1.66	90	3.381	0.014	12	3.9	0	0	2.9895	3.0035	1.942
+-param Cm6+3	1.801	90	3.326	0.013	12	3.9	0	0	2.8315	3.1895	1.9
+-param Bk6+3	1.761	90	3.339	0.013	12	3.9	0	0	3.1935	3.0355	1.9
+-param Cf6+3	1.75	90	3.313	0.013	12	3.9	0	0	3.197	3.101	1.9
+-param Es6+3	1.724	90	3.299	0.012	12	3.9	0	0	3.333	3.089	1.9
+-param Fm6+3	1.712	90	3.286	0.012	12	3.9	0	0	3.4	3.1	1.9
+-param Md6+3	1.689	90	3.274	0.011	12	3.9	0	0	3.47	3.11	1.9
+-param No6+3	1.679	90	3.248	0.011	12	3.9	0	0	3.475	3.175	1.9
+-param Lw6+3	1.698	90	3.236	0.011	12	3.9	0	0	3.5	3.2	1.9
++# Atom          r1  theta0  x1  D1  zeta    Z1  Vi  Uj  Xi  Hard    Radius
++param Du  0.01   180 0.4 5000 12    10.0    0 0 9.66    14.92   0.7
++param H_    0.354   180 2.886   0.044   12  0.712   0   0   4.528   6.9452  0.371
++param H_b   0.46    83.5    2.886   0.044   12  0.712   0   0   4.528   6.9452  0.371
++param He4+4 0.849   90  2.362   0.056   15.24   0.098   0   0   9.66    14.92   1.3
++param Li    1.336   180 2.451   0.025   12  1.026   0   2   3.006   2.386   1.557
++param Be3+2 1.074   109.47  2.745   0.085   12  1.565   0   2   4.877   4.443   1.24
++param B_3   0.838   109.47  4.083   0.18    12.052  1.755   0   2   5.11    4.75    0.822
++param B_2   0.828   120 4.083   0.18    12.052  1.755   0   2   5.11    4.75    0.822
++param C_3   0.757   109.47  3.851   0.105   12.73   1.912   2.119   2   5.343   5.063   0.759
++param C_R   0.729   120 3.851   0.105   12.73   1.912   0   2   5.343   5.063   0.759
++param C_2   0.732   120 3.851   0.105   12.73   1.912   0   2   5.343   5.063   0.759
++param C_1   0.706   180 3.851   0.105   12.73   1.912   0   2   5.343   5.063   0.759
++param N_3   0.7     106.7   3.66    0.069   13.407  2.544   0.45    2   6.899   5.88    0.715
++param N_R   0.699   120 3.66    0.069   13.407  2.544   0   2   6.899   5.88    0.715
++param N_2   0.685   111.2   3.66    0.069   13.407  2.544   0   2   6.899   5.88    0.715
++param N_1   0.656   180 3.66    0.069   13.407  2.544   0   2   6.899   5.88    0.715
++param O_3   0.658   104.51  3.5 0.06    14.085  2.3 0.018   2   8.741   6.682   0.669
++param O_3_z 0.528   146 3.5 0.06    14.085  2.3 0.018   2   8.741   6.682   0.669
++param O_3_f 0.634   109.47  3.5 0.06    14.085  2.3 0.018   2   8.741 6.682 0.669
++param O_2_z 0.528   120.0   3.5 0.06    14.085  2.3 0.018   2   8.741   6.682   0.669
++param O_R   0.68    110 3.5 0.06    14.085  2.3 0   2   8.741   6.682   0.669
++param O_2   0.634   120 3.5 0.06    14.085  2.3 0   2   8.741   6.682   0.669
++param O_1   0.639   180 3.5 0.06    14.085  2.3 0   2   8.741   6.682   0.669
++param F_    0.668   180 3.364   0.05    14.762  1.735   0   2   10.874  7.474   0.706
++param Ne4+4 0.92    90  3.243   0.042   15.44   0.194   0   2   11.04   10.55   1.768
++param Na    1.539   180 2.983   0.03    12  1.081   0   1.25    2.843   2.296   2.085
++param Mg3+2 1.421   109.47  3.021   0.111   12  1.787   0       1.25    3.951   3.693   1.5
++param Mg6   1.421   90  3.021   0.111   12  1.787   0   1.25    3.951   3.693   1.5
++param Al3   1.244   109.47  4.499   0.505   11.278  1.792   0   1.25    4.06    3.59    1.201
++param Al6+3 1.220   90.00   4.499   0.505   11.278  1.792   0   1.25    4.06    3.59    1.201
++param Si3   1.117   109.47  4.295   0.402   12.175  2.323   1.225   1.25    4.168   3.487   1.176
++param P_3+3 1.101   93.8    4.147   0.305   13.072  2.863   2.4 1.25    5.463   4   1.102
++param P_3+5 1.056   109.47  4.147   0.305   13.072  2.863   2.4 1.25    5.463   4   1.102
++param P_3+q 1.056   109.47  4.147   0.305   13.072  2.863   2.4 1.25    5.463   4   1.102
++param S_3+2 1.064   92.1    4.035   0.274   13.969  2.703   0.484   1.25    6.928   4.486   1.047
++param S_3+4 1.049   103.2   4.035   0.274   13.969  2.703   0.484   1.25    6.928   4.486   1.047
++param S_3+6 1.027   109.47  4.035   0.274   13.969  2.703   0.484   1.25    6.928   4.486   1.047
++param S_R   1.077   92.2    4.035   0.274   13.969  2.703   0   1.25    6.928   4.486   1.047
++param S_2   0.854   120 4.035   0.274   13.969  2.703   0   1.25    6.928   4.486   1.047
++param Cl    1.044   180 3.947   0.227   14.866  2.348   0   1.25    8.564   4.946   0.994
++param Ar4+4 1.032   90  3.868   0.185   15.763  0.3 0   1.25    9.465   6.355   2.108
++param K_    1.953   180 3.812   0.035   12  1.165   0   0.7 2.421   1.92    2.586
++param Ca6+2 1.761   90  3.399   0.238   12  2.141   0   0.7 3.231   2.88    2
++param Sc3+3 1.513   109.47  3.295   0.019   12  2.592   0   0.7 3.395 3.08    1.75
++param Sc6+3 1.440    90.00  3.175   0.017   12  2.659   0   0.7 3.395 3.08    1.75
++param Ti3+4 1.412   109.47  3.175   0.017   12  2.659   0   0.7 3.47    3.38    1.607
++param Ti6+4 1.412   90.0  3.175   0.017   12  2.659   0   0.7 3.47    3.38    1.607
++param Ti4+2 1.380   90.0  3.175   0.017   12  2.659   0   0.7 3.47    3.38    1.607
++param V_3+5 1.402   109.47  3.144   0.016   12  2.679   0   0.7 3.65    3.41    1.47
++param V_4+2 1.180    90.00  3.144   0.016   12  2.679   0   0.7 3.65    3.41    1.47
++param V_6+3 1.300    90.00  3.144   0.016   12  2.679   0   0.7 3.65    3.41    1.47
++param Cr6+3 1.345   90  3.023   0.015   12  2.463   0   0.7 3.415   3.865   1.402
++param Cr4+2 1.100   90  3.023   0.015   12  2.463   0   0.7 3.415   3.865   1.402
++param Cr6f3 1.280   90  3.023   0.015   12  2.463   0   0.7 3.415   3.865  1.402
++param Mn6+2 1.382   90  2.961   0.013   12  2.43    0   0.7 3.325   4.105   1.533
++param Mn6+3 1.340   90  2.961   0.013   12  2.43    0   0.7 3.325   4.105   1.533
++param Mn4+2 1.260   90  2.961   0.013   12  2.43    0   0.7 3.325   4.105   1.533
++param Fe3+2 1.27    109.47  2.912   0.013   12  2.43    0   0.7 3.76    4.14    1.393
++param Fe6+2 1.335   90  2.912   0.013   12  2.43    0   0.7 3.76    4.14    1.393
++param Fe6+3 1.320   90  2.912   0.013   12  2.43    0   0.7 3.76    4.14    1.393
++param Fe4+2 1.100   90  2.912   0.013   12  2.43    0   0.7 3.76    4.14    1.393
++param Co6+3 1.241   90  2.872   0.014   12  2.43    0   0.7 4.105   4.175   1.406
++param Co3+2 1.240   90  2.872   0.014   12  1.308   0   0.7 4.105   4.175   1.406
++param Co6+3 1.160   90  2.872   0.014   12  1.308   0   0.7 4.105   4.175   1.406
++param Ni4+2 1.164   90  2.834   0.015   12  2.43    0   0.7 4.465   4.205   1.398
++param Cu3+1 1.302   109.47  3.495   0.005   12  1.756   0   0.7 4.2 4.22    1.434
++param Cu4+2 1.280    90.00  3.495   0.005   12  2.430   0   0.7 4.2 4.22    1.434
++param Zn3+2 1.193   109.47  2.763   0.124   12  1.308   0   0.7 5.106   4.285   1.4
++param Zn4+2 1.340    90.00  2.763   0.124   12  1.308   0   0.7 5.106   4.285   1.4
++param Zn3f2 1.240   109.47  2.763   0.124   12  1.308   0   0.7 5.106   4.285   1.4
++param Ga3+3 1.26    109.47  4.383   0.415   11  1.821   0   0.7 3.641   3.16    1.211
++param Ge3   1.197   109.47  4.28    0.379   12  2.789   0.701   0.7 4.051   3.438   1.189
++param As3+3 1.211   92.1    4.23    0.309   13  2.864   1.5 0.7 5.188   3.809   1.204
++param Se3+2 1.19    90.6    4.205   0.291   14  2.764   0.335   0.7 6.428   4.131   1.224
++param Br    1.192   180 4.189   0.251   15  2.519   0   0.7 7.79    4.425   1.141
++param Kr4+4 1.147   90  4.141   0.22    16  0.452   0   0.7 8.505   5.715   2.27
++param Rb    2.26    180 4.114   0.04    12  1.592   0   0.2 2.331   1.846   2.77
++param Sr6+2 2.052   90  3.641   0.235   12  2.449   0   0.2 3.024   2.44    2.415
++param Y_3+3 1.698   109.47  3.345   0.072   12  3.257   0   0.2 3.83    2.81    1.998
++param Zr3+4 1.564   109.47  3.124   0.069   12  3.667   0   0.2 3.4 3.55    1.758
++param Nb3+5 1.473   109.47  3.165   0.059   12  3.618   0   0.2 3.55    3.38    1.603
++param Mo6+6 1.467   90  3.052   0.056   12  3.4 0   0.2 3.465   3.755   1.53
++param Mo3+6 1.484   109.47  3.052   0.056   12  3.4 0   0.2 3.465   3.755   1.53
++param Tc6+5 1.322   90  2.998   0.048   12  3.4 0   0.2 3.29    3.99    1.5
++param Ru6+2 1.478   90  2.963   0.056   12  3.4 0   0.2 3.575   4.015   1.5
++param Rh6+3 1.332   90  2.929   0.053   12  3.5 0   0.2 3.975   4.005   1.509
++param Pd4+2 1.338   90  2.899   0.048   12  3.21    0   0.2 4.32    4   1.544
++param Ag1+1 1.386   180 3.148   0.036   12  1.956   0   0.2 4.436   3.134   1.622
++param Cd3+2 1.403   109.47  2.848   0.228   12  1.65    0   0.2 5.034   3.957   1.6
++param In3+3 1.459   109.47  4.463   0.599   11  2.07    0   0.2 3.506   2.896   1.404
++param Sn3   1.398   109.47  4.392   0.567   12  2.961   0.199   0.2 3.987   3.124   1.354
++param Sb3+3 1.407   91.6    4.42    0.449   13  2.704   1.1 0.2 4.899   3.342   1.404
++param Te3+2 1.386   90.25   4.47    0.398   14  2.882   0.3 0.2 5.816   3.526   1.38
++param I_    1.382   180 4.5 0.339   15  2.65    0   0.2 6.822   3.762   1.333
++param Xe4+4 1.267   90  4.404   0.332   12  0.556   0   0.2 7.595   4.975   2.459
++param Cs    2.57    180 4.517   0.045   12  1.573   0   0.1 2.183   1.711   2.984
++param Ba6+2 2.277   90  3.703   0.364   12  2.727   0   0.1 2.814   2.396   2.442
++param La3+3 1.943   109.47  3.522   0.017   12  3.3 0   0.1 2.8355  2.7415  2.071
++param Ce6+3 1.841   90  3.556   0.013   12  3.3 0   0.1 2.774   2.692   1.925
++param Pr6+3 1.823   90  3.606   0.01    12  3.3 0   0.1 2.858   2.564   2.007
++param Nd6+3 1.816   90  3.575   0.01    12  3.3 0   0.1 2.8685  2.6205  2.007
++param Pm6+3 1.801   90  3.547   0.009   12  3.3 0   0.1 2.881   2.673   2
++param Sm6+3 1.78    90  3.52    0.008   12  3.3 0   0.1 2.9115  2.7195  1.978
++param Eu6+3 1.771   90  3.493   0.008   12  3.3 0   0.1 2.8785  2.7875  2.227
++param Gd6+3 1.735   90  3.368   0.009   12  3.3 0   0.1 3.1665  2.9745  1.968
++param Tb6+3 1.732   90  3.451   0.007   12  3.3 0   0.1 3.018   2.834   1.954
++param Dy6+3 1.71    90  3.428   0.007   12  3.3 0   0.1 3.0555  2.8715  1.934
++param Ho6+3 1.696   90  3.409   0.007   12  3.416   0   0.1 3.127   2.891   1.925
++param Er6+3 1.673   90  3.391   0.007   12  3.3 0   0.1 3.1865  2.9145  1.915
++param Tm6+3 1.66    90  3.374   0.006   12  3.3 0   0.1 3.2514  2.9329  2
++param Yb6+3 1.637   90  3.355   0.228   12  2.618   0   0.1 3.2889  2.965   2.158
++param Lu6+3 1.671   90  3.64    0.041   12  3.271   0   0.1 2.9629  2.4629  1.896
++param Hf3+4 1.611   109.47  3.141   0.072   12  3.921   0   0.1 3.7 3.4 1.759
++param Ta3+5 1.511   109.47  3.17    0.081   12  4.075   0   0.1 5.1 2.85    1.605
++param W_6+6 1.392   90  3.069   0.067   12  3.7 0   0.1 4.63    3.31    1.538
++param W_3+4 1.526   109.47  3.069   0.067   12  3.7 0   0.1 4.63    3.31    1.538
++param W_3+6 1.38    109.47  3.069   0.067   12  3.7 0   0.1 4.63    3.31    1.538
++param Re6+5 1.372   90  2.954   0.066   12  3.7 0   0.1 3.96    3.92    1.6
++param Re3+7 1.314   109.47  2.954   0.066   12  3.7 0   0.1 3.96    3.92    1.6
++param Os6+6 1.372   90  3.12    0.037   12  3.7 0   0.1 5.14    3.63    1.7
++param Ir6+3 1.371   90  2.84    0.073   12  3.731   0   0.1 5   4   1.866
++param Pt4+2 1.364   90  2.754   0.08    12  3.382   0   0.1 4.79    4.43    1.557
++param Au4+3 1.262   90  3.293   0.039   12  2.625   0   0.1 4.894   2.586   1.618
++param Hg1+2 1.34    180 2.705   0.385   12  1.75    0   0.1 6.27    4.16    1.6
++param Tl3+3 1.518   120 4.347   0.68    11  2.068   0   0.1 3.2 2.9 1.53
++param Pb3   1.459   109.47  4.297   0.663   12  2.846   0.1 0.1 3.9 3.53    1.444
++param Bi3+3 1.512   90  4.37    0.518   13  2.47    1   0.1 4.69    3.74    1.514
++param Po3+2 1.5 90  4.709   0.325   14  2.33    0.3 0.1 4.21    4.21    1.48
++param At    1.545   180 4.75    0.284   15  2.24    0   0.1 4.75    4.75    1.47
++param Rn4+4 1.42    90  4.765   0.248   16  0.583   0   0.1 5.37    5.37    2.2
++param Fr    2.88    180 4.9 0.05    12  1.847   0   0   2   2   2.3
++param Ra6+2 2.512   90  3.677   0.404   12  2.92    0   0   2.843   2.434   2.2
++param Ac6+3 1.983   90  3.478   0.033   12  3.9 0   0   2.835   2.835   2.108
++param Th6+4 1.721   90  3.396   0.026   12  4.202   0   0   3.175   2.905   2.018
++param Pa6+4 1.711   90  3.424   0.022   12  3.9 0   0   2.985   2.905   1.8
++param U_6+4 1.684   90  3.395   0.022   12  3.9 0   0   3.341   2.853   1.713
++param Np6+4 1.666   90  3.424   0.019   12  3.9 0   0   3.549   2.717   1.8
++param Pu6+4 1.657   90  3.424   0.016   12  3.9 0   0   3.243   2.819   1.84
++param Am6+4 1.66    90  3.381   0.014   12  3.9 0   0   2.9895  3.0035  1.942
++param Cm6+3 1.801   90  3.326   0.013   12  3.9 0   0   2.8315  3.1895  1.9
++param Bk6+3 1.761   90  3.339   0.013   12  3.9 0   0   3.1935  3.0355  1.9
++param Cf6+3 1.75    90  3.313   0.013   12  3.9 0   0   3.197   3.101   1.9
++param Es6+3 1.724   90  3.299   0.012   12  3.9 0   0   3.333   3.089   1.9
++param Fm6+3 1.712   90  3.286   0.012   12  3.9 0   0   3.4 3.1 1.9
++param Md6+3 1.689   90  3.274   0.011   12  3.9 0   0   3.47    3.11    1.9
++param No6+3 1.679   90  3.248   0.011   12  3.9 0   0   3.475   3.175   1.9
++param Lw6+3 1.698   90  3.236   0.011   12  3.9 0   0   3.5 3.2 1.9
+diff -urN openbabel-2.3.2/include/openbabel/forcefield.h openbabel-2.3.2-gg/include/openbabel/forcefield.h
+--- openbabel-2.3.2/include/openbabel/forcefield.h	2012-10-03 21:08:17.000000000 +0200
++++ openbabel-2.3.2-gg/include/openbabel/forcefield.h	2025-10-24 12:13:34.525445889 +0200
+@@ -28,11 +28,13 @@
+ #include <openbabel/babelconfig.h>
+ #include <openbabel/base.h>
+ #include <openbabel/mol.h>
++#include <openbabel/generic.h>
+ #include <openbabel/plugin.h>
+ #include <openbabel/grid.h>
+ #include <openbabel/griddata.h>
+ #include <float.h>
+ 
++using namespace std;
+ namespace OpenBabel
+ {
+   // log levels
+@@ -157,10 +159,11 @@
+     virtual void SetupPointers()
+     {
+       if (!a || !b) return;
+-      pos_a = a->GetCoordinate();
++      pos_a = a->GetCoordinate();      
+       idx_a = a->GetIdx();
+       pos_b = b->GetCoordinate();
+       idx_b = b->GetIdx();
++
+     }
+   };
+ 
+@@ -225,6 +228,7 @@
+       idx_c = c->GetIdx();
+       pos_d = d->GetCoordinate();
+       idx_d = d->GetIdx();
++
+     }
+   };
+ 
+@@ -411,6 +415,7 @@
+     double _factor;
+   };
+ 
++
+   // Class OBForceField
+   // class introduction in forcefield.cpp
+   class OBFPRT OBForceField : public OBPlugin
+@@ -579,6 +584,12 @@
+     std::vector<OBBitVec> _interGroup; //!< groups for which intra-molecular interactions should be calculated
+     std::vector<std::pair<OBBitVec, OBBitVec> > _interGroups; //!< groups for which intra-molecular
+                                                               //!< interactions should be calculated
++
++    // For the atomtypes
++    std::vector<string> _atomtype;
++    int _natomtypes;
++    
++    
+   public:
+     /*! Clone the current instance. May be desirable in multithreaded environments,
+      *  Should be deleted after use
+@@ -1674,6 +1685,76 @@
+     }
+     //@}
+ 
++    // methods to export forcefield parameters
++    // they are declared as virtual functions, which can be overridden
++    // by the particular force-field implementation
++    // GG
++
++    // the number of different atom types
++    virtual int NAtomTypes() { return -1; }
++    // the name of the nth type
++    virtual const char* TypeName(int n) { static const char def[16]="NONE"; return def; }
++    // the type of the atom as a number between 0 and NAtomTypes-1
++    virtual int AtomTypeAsNumber(int atom) { return -1; }
++    // the type of the atom as a C-style string
++    char* AtomType(int atom) { 
++      OBAtom *a = _mol.GetAtom(atom+1); 
++      return a->GetType(); }
++
++    // the mass of the n-th type
++    double MassOfAtomType(int n) {
++      OBAtom *a;
++      const char *name = TypeName(n);
++      FOR_ATOMS_OF_MOL(a,_mol) {
++        if( !strcmp(a->GetType(),name)) {
++          return a->GetAtomicMass();
++        }
++      }
++      return 0.0;
++    }
++
++    // NON-BONDED TERMS
++    virtual double LJEps(const char *name) { return 0.0; }
++    virtual double LJSig(const char *name) { return 0.0; }
++
++    // BONDED TERMS
++    // the number of bonds
++    virtual int NBonds() { return -1;}
++    // the number of force-field parameters describing this bond
++    virtual int NBondParams() { return -1;}
++    // the value of the a given parameter for the given bond
++    virtual double BondParam(int bond, int parnum) { return 0.0;}
++    virtual int BondAtomIdx(int bond, int which) { return -1; }
++
++    // ANGLE TERMS
++    // the number of angles
++    virtual int NAngles() { return -1;}
++    // the number of force-field parameters describing this bond
++    virtual int NAngleParams() { return -1;}
++    // the value of the a given parameter for the given bond
++    virtual double AngleParam(int angle, int parnum) { return 0.0;}
++    virtual int AngleAtomIdx(int angle, int which) { return -1; }
++
++    // TORSION TERMS
++    // the number of torsions
++    virtual int NTorsions() { return -1;}
++    // the number of force-field parameters describing this bond
++    virtual int NTorsionParams() { return -1;}
++    // the value of the a given parameter for the given bond
++    virtual double TorsionParam(int torsion, int parnum) { return 0.0;}
++    virtual int TorsionAtomIdx(int torsion, int which) { return -1; }
++
++    // INVERSION (out-of-plane) TERMS
++    // the number of inversions
++    virtual int NInversions() { return -1;}
++    // the number of force-field parameters describing this bond
++    virtual int NInversionParams() { return -1;}
++    // the value of the a given parameter for the given bond
++    virtual double InversionParam(int inv, int parnum) { return 0.0;}
++    virtual int InversionAtomIdx(int inv, int which) { return -1; }
++    
++    // end of virtual functions to export the parameters (GG)
++
+   }; // class OBForceField
+ 
+ }// namespace OpenBabel
+diff -urN openbabel-2.3.2/include/openbabel/generic.h openbabel-2.3.2-gg/include/openbabel/generic.h
+--- openbabel-2.3.2/include/openbabel/generic.h	2010-10-10 04:05:12.000000000 +0200
++++ openbabel-2.3.2-gg/include/openbabel/generic.h	2025-10-24 12:13:34.525445889 +0200
+@@ -456,11 +456,20 @@
+     //! \param cart Vector of cartesian coordinates
+     //! \return Cartesian coordinates within cell boundaries.
+     vector3 WrapCartesianCoordinate(vector3 cart);
++
+     //! Wraps fractional coordinate to fall within the unit cell.
+     //! \param frac Vector of fractional coordinates
+     //! \return Fractional coordinates within cell boundaries (between 0 and 1).
+     vector3 WrapFractionalCoordinate(vector3 frac);
+ 
++    //! Finds the position of the minimum image distance
++    //! \param cart Vector of cartesian coordinates
++    //! \return Cartesian coordinates within cell boundaries.
++    // GG
++    vector3 MinimumImage(vector3 cart);
++    vector3 MinimumImageFractional(vector3 cart);
++
++
+     //! \return The numeric value of the given spacegroup
+     int GetSpaceGroupNumber( std::string name = "" );
+     //! \return The cell volume (in Angstroms^3)
+diff -urN openbabel-2.3.2/include/openbabel/obmolecformat.h openbabel-2.3.2-gg/include/openbabel/obmolecformat.h
+--- openbabel-2.3.2/include/openbabel/obmolecformat.h	2010-10-10 04:05:12.000000000 +0200
++++ openbabel-2.3.2-gg/include/openbabel/obmolecformat.h	2025-10-24 12:26:33.313650681 +0200
+@@ -23,10 +23,12 @@
+   #include <hash_map>
+ #endif
+ 
++#include <unordered_map>
++
+ #if __GNUC__ == 4 && __GNUC_MINOR__ >= 1
+-  #include <tr1/unordered_map>
++  #include <unordered_map>
+ #elif defined(USE_BOOST)
+-  #include <boost/tr1/unordered_map.hpp>
++  #include <boost/unordered_map.hpp>
+ #endif
+ 
+ #include <typeinfo>
+@@ -142,7 +144,7 @@
+ #ifdef _MSC_VER
+   typedef stdext::hash_map<std::string, unsigned> NameIndexType;
+ #elif (__GNUC__ == 4 && __GNUC_MINOR__ >= 1 && !defined(__APPLE_CC__)) || defined (USE_BOOST)
+-  typedef std::tr1::unordered_map<std::string, unsigned> NameIndexType;
++  typedef std::unordered_map<std::string, unsigned> NameIndexType;
+ #else
+   typedef std::map<std::string, unsigned> NameIndexType;
+ #endif
+diff -urN openbabel-2.3.2/include/openbabel/obmolecformat.h~ openbabel-2.3.2-gg/include/openbabel/obmolecformat.h~
+--- openbabel-2.3.2/include/openbabel/obmolecformat.h~	1970-01-01 01:00:00.000000000 +0100
++++ openbabel-2.3.2-gg/include/openbabel/obmolecformat.h~	2025-10-24 12:13:34.525445889 +0200
+@@ -0,0 +1,175 @@
++/**********************************************************************
++obmolecformat.h - Subclass of OBFormat for conversion of OBMol.
++
++Copyright (C) 2005 Chris Morley
++
++This file is part of the Open Babel project.
++For more information, see <http://openbabel.org/>
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation version 2 of the License.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++***********************************************************************/
++
++#ifndef OB_MOLECULEFORMAT_H
++#define OB_MOLECULEFORMAT_H
++
++#ifdef _MSC_VER
++  #include <hash_map>
++#endif
++
++#if __GNUC__ == 4 && __GNUC_MINOR__ >= 1
++  #include <unordered_map>
++#elif defined(USE_BOOST)
++  #include <boost/unordered_map.hpp>
++#endif
++
++#include <typeinfo>
++
++#include <openbabel/mol.h>
++#ifdef HAVE_SHARED_POINTER
++  #include <openbabel/reaction.h>
++#endif
++#include <openbabel/babelconfig.h>
++#include <openbabel/obconversion.h>
++#include <typeinfo>
++#include <openbabel/descriptor.h>
++#include <set>
++
++namespace OpenBabel {
++
++// This macro is used in DLL builds. If it has not
++// been set in babelconfig.h, define it as nothing.
++#ifndef OBCOMMON
++  #define OBCOMMON
++#endif
++
++/** \class OBMoleculeFormat obmolecformat.h <openbabel/obmolecformat.h>
++    \brief An OBFormat convenience subclass for conversion to/from OBMol data
++
++    This class is not intended for direct use outside of Open Babel, unless
++    you're writing a new format converting to or from an OBMol molecule.
++    (e.g., see http://openbabel.org/wiki/HowTo:Add_A_New_File_Format).
++
++    An OBFormat which converts to and/or from OBMol can derive from this class
++    to save duplicating the ReadChemObject() and/or WriteChemObject() methods.
++    Derive directly from OBFormat if the object converted is not OBMol or
++    if interaction with the framework is required during the execution
++    of ReadMolecule() or WriteMolecule(), as for example in CMLFormat
++**/
++
++//////////////////////////////////////////////////////////////////////
++
++class OBCOMMON OBMoleculeFormat : public OBFormat
++{
++public:
++
++  OBMoleculeFormat()
++  {
++    if(!OptionsRegistered)
++    {
++      OptionsRegistered=true;
++      OBConversion::RegisterOptionParam("b",         this, 0, OBConversion::INOPTIONS);
++      OBConversion::RegisterOptionParam("s",         this, 0, OBConversion::INOPTIONS);
++      OBConversion::RegisterOptionParam("title",     this, 1, OBConversion::GENOPTIONS);
++      OBConversion::RegisterOptionParam("addtotitle",this, 1, OBConversion::GENOPTIONS);
++      OBConversion::RegisterOptionParam("property",  this, 2, OBConversion::GENOPTIONS);
++      OBConversion::RegisterOptionParam("C",         this, 0, OBConversion::GENOPTIONS);
++      OBConversion::RegisterOptionParam("j",         this, 0, OBConversion::GENOPTIONS);
++      OBConversion::RegisterOptionParam("join",      this, 0, OBConversion::GENOPTIONS);
++      OBConversion::RegisterOptionParam("separate",  this, 0, OBConversion::GENOPTIONS);
++
++      //The follow are OBMol options, which should not be in OBConversion.
++      //But here isn't entirely appropriate either, since one could have
++      //OBMol formats loaded but which don't derived from this class.
++      //However, this possibility is remote.
++      OBConversion::RegisterOptionParam("s", NULL, 1,OBConversion::GENOPTIONS);
++      OBConversion::RegisterOptionParam("v", NULL, 1,OBConversion::GENOPTIONS);
++      OBConversion::RegisterOptionParam("h", NULL, 0,OBConversion::GENOPTIONS);
++      OBConversion::RegisterOptionParam("d", NULL, 0,OBConversion::GENOPTIONS);
++      OBConversion::RegisterOptionParam("b", NULL, 0,OBConversion::GENOPTIONS);
++      OBConversion::RegisterOptionParam("c", NULL, 0,OBConversion::GENOPTIONS);
++      OBConversion::RegisterOptionParam("p", NULL, 1,OBConversion::GENOPTIONS);
++      OBConversion::RegisterOptionParam("t", NULL, 0,OBConversion::GENOPTIONS);
++      OBConversion::RegisterOptionParam("k", NULL, 0,OBConversion::GENOPTIONS);
++      OBConversion::RegisterOptionParam("filter", NULL, 1,OBConversion::GENOPTIONS);
++      OBConversion::RegisterOptionParam("add", NULL, 1,OBConversion::GENOPTIONS);
++      OBConversion::RegisterOptionParam("delete", NULL, 1,OBConversion::GENOPTIONS);
++      OBConversion::RegisterOptionParam("append", NULL, 1,OBConversion::GENOPTIONS);
++    }
++  }
++
++  //! Static routine,  which can be called from elsewhere
++  static bool ReadChemObjectImpl(OBConversion* pConv, OBFormat*);
++  //! Static routine,  which can be called from elsewhere
++  static bool WriteChemObjectImpl(OBConversion* pConv, OBFormat*);
++
++  /// The "Convert" interface for reading a new molecule
++  virtual bool ReadChemObject(OBConversion* pConv)
++  { return ReadChemObjectImpl(pConv, this);}
++
++  /// The "Convert" interface for writing a new molecule
++  virtual bool WriteChemObject(OBConversion* pConv)
++  { return WriteChemObjectImpl(pConv, this);}
++
++  ///Applies output options to molecule. Returns false to terminate output.
++  static bool DoOutputOptions(OBBase* pOb, OBConversion* pConv);
++
++  /// \name Routines to handle the -C option for combining data from several OBMols
++  //@{
++  //! Defer output of a molecule until later, so it can be combined with others
++  //! \return Success, or false if no molecule was read.
++  static bool   DeferMolOutput(OBMol* pmol, OBConversion* pConv, OBFormat* pF);
++  //! Write out all molecules queued with DeferMolOutput
++  static bool   OutputDeferredMols(OBConversion* pConv);
++  //! Delete the list of queued molecules from DeferMolOutput
++  static bool   DeleteDeferredMols();
++  //! \return the OBMol which combines @p pFirst and @p pSecond (i.e.)
++  static OBMol* MakeCombinedMolecule(OBMol* pFirst, OBMol* pSecond);
++  //@}
++
++#ifdef HAVE_SHARED_POINTER
++  //!When sent an OBReaction object, output all the constituent molecules
++  static bool OutputMolsFromReaction
++    (OBReaction* pReact, OBConversion* pConv, OBFormat* pFormat);
++#endif
++
++#ifdef _MSC_VER
++  typedef stdext::hash_map<std::string, unsigned> NameIndexType;
++#elif (__GNUC__ == 4 && __GNUC_MINOR__ >= 1 && !defined(__APPLE_CC__)) || defined (USE_BOOST)
++  typedef std::unordered_map<std::string, unsigned> NameIndexType;
++#else
++  typedef std::map<std::string, unsigned> NameIndexType;
++#endif
++
++  // documentation in obmolecformat.cpp
++  static bool   ReadNameIndex(NameIndexType& index, const std::string& datafilename,
++                  OBFormat* pInFormat);
++
++  //! \return the type of data converted by this format (here, OBMol)
++  const std::type_info& GetType()
++  {
++    return typeid(OBMol*);
++  }
++
++private:
++
++  static bool OptionsRegistered;
++  static std::map<std::string, OBMol*> IMols;
++  static OBMol* _jmol; //!< Accumulates molecules with the -j option
++  static std::vector<OBMol> MolArray; //!< Used in --separate option
++  static bool StoredMolsReady; //!< Used in --separate option
++  static OBDescriptor* _pDesc;
++
++};
++
++}
++#endif //OB_MOLECULEFORMAT_H
++
++//! \file obmolecformat.h
++//! \brief Subclass of OBFormat for conversion of OBMol.
+diff -urN openbabel-2.3.2/include/openbabel/obutil.h openbabel-2.3.2-gg/include/openbabel/obutil.h
+--- openbabel-2.3.2/include/openbabel/obutil.h	2010-10-10 04:05:12.000000000 +0200
++++ openbabel-2.3.2-gg/include/openbabel/obutil.h	2025-10-24 12:27:40.361525854 +0200
+@@ -24,6 +24,7 @@
+ 
+ #include <string>
+ #include <iosfwd>
++#include <ctime>
+ 
+ #if TIME_WITH_SYS_TIME
+ #include <sys/time.h>
+diff -urN openbabel-2.3.2/include/openbabel/obutil.h~ openbabel-2.3.2-gg/include/openbabel/obutil.h~
+--- openbabel-2.3.2/include/openbabel/obutil.h~	1970-01-01 01:00:00.000000000 +0100
++++ openbabel-2.3.2-gg/include/openbabel/obutil.h~	2010-10-10 04:05:12.000000000 +0200
+@@ -0,0 +1,329 @@
++/**********************************************************************
++obutil.h - Various utility methods.
++
++Copyright (C) 1998-2001 by OpenEye Scientific Software, Inc.
++Some portions Copyright (C) 2001-2006 by Geoffrey R. Hutchison
++
++This file is part of the Open Babel project.
++For more information, see <http://openbabel.org/>
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation version 2 of the License.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++***********************************************************************/
++
++#ifndef OB_UTIL_H
++#define OB_UTIL_H
++
++#include <openbabel/babelconfig.h>
++
++#include <string>
++#include <iosfwd>
++
++#if TIME_WITH_SYS_TIME
++#include <sys/time.h>
++#include <time.h>
++#else
++#if HAVE_SYS_TIME_H
++#include <sys/time.h>
++#else
++#include <time.h>
++#endif
++#endif
++
++#include <math.h>
++
++#ifndef M_PI
++#define M_PI 3.14159265358979323846
++#endif
++
++// For backwards compatibility. Will be removed in the future
++#include <openbabel/rand.h>
++
++namespace OpenBabel
++{
++
++  // class introduction in obutil.cpp
++  class OBAPI OBStopwatch
++  {
++#if HAVE_CLOCK_T
++    clock_t start; //!< the start of timing
++    clock_t stop;  //!< the current time
++#else
++    timeval start; //!< the start of timing
++    timeval stop;  //!< the current time
++#endif
++
++  public:
++#if HAVE_CLOCK_T
++
++    //! Mark the start of "stopwatch" timing
++    void  Start()
++    {
++      start= clock();
++    }
++    //! \return The time since calling OBStopwatch::Start() in seconds.
++    double Lap()
++    {
++      stop= clock();
++      return((stop - start) / CLOCKS_PER_SEC);
++    }
++#else
++    //! Mark the start of "stopwatch" timing
++    void Start()
++    {
++      gettimeofday(&start, NULL);
++    }
++    //! \return The time since calling OBStopwatch::Start() in seconds.
++    double Lap()
++    {
++      gettimeofday(&stop, NULL);
++      return((stop.tv_sec - start.tv_sec)
++             + (stop.tv_usec - start.tv_usec)/1000000.0);
++    }
++#endif
++
++    //! \return The time since calling OBStopwatch::Start() in seconds.
++    double Elapsed()
++    {
++      return(Lap());
++    }
++  };
++
++
++  //! \class OBSqrtTbl obutil.h <openbabel/obutil.h>
++  //! \brief Square Root lookup table - given a distance squared returns distance
++  class OBAPI OBSqrtTbl
++  {
++    double _max,_incr,*_tbl;
++  public:
++  OBSqrtTbl():
++    _max(0.0), _incr(0.0),  _tbl(NULL)
++      { }
++    //! \brief Create a square root table to handle up to the square root of @p max
++    //! (e.g., if you want the square root of 144, supply 12 for max)
++    //! \param max The maximum square root stored in the lookup table
++    //! \param incr The floating point resolution of the lookup table
++  OBSqrtTbl(const double max, const double incr):
++    _max(max*max), _incr(incr), _tbl(NULL)
++      {
++        Init(max,incr);
++      }
++    ~OBSqrtTbl()
++      {
++        if (_tbl)
++          {
++            delete [] _tbl;
++            _tbl = NULL;
++          }
++      }
++    //! \brief Fast square root calculation using a lookup table
++    //! \return Square root of @p d2
++    double Sqrt(double d2) const
++    {
++      if (_tbl)
++        return((d2 < _max) ? _tbl[static_cast<int>(d2*_incr)]:sqrt(d2));
++      else
++        return 0.0;
++    }
++    //! \brief Initialize the square root lookup table
++    //! \param max The maximum square root stored in the lookup table (e.g., if you want the square root of 144, supply 12 for max)
++    //! \param incr The floating point resolution of the lookup table
++    void Init(double max,double incr)
++    {
++      // parameters are potentially unneeded, but let's do this until we can
++      // deprecate them
++      _max = max * max;
++      _incr = incr;
++
++      //array size needs to be large enough to account for fp error
++      int i;
++      double r;
++      _tbl = new double [static_cast<int>((_max/_incr)+10)];
++      for (r = (_incr/2.0),i=0;r <= _max;r += _incr,++i)
++        _tbl[i] = sqrt(r);
++
++      _incr = 1/_incr;
++    }
++  };
++
++  //***RMS helper methods***/
++#ifndef __KCC
++  extern "C" {
++  OBAPI void  rotate_coords(double*,double m[3][3],unsigned);
++  OBAPI double calc_rms(double*,double*,unsigned int);
++  }
++#else
++  OBAPI void  rotate_coords(double*,double m[3][3],unsigned);
++  OBAPI double calc_rms(double*,double*,unsigned int);
++#endif
++ 
++#ifndef SWIG
++  //! \name  String conversion utilities
++  //@{
++  // Documentation in obutil.cpp
++  OBAPI void ToUpper(std::string&);
++  OBAPI void ToUpper(char*);
++  OBAPI void ToLower(std::string&);
++  OBAPI void ToLower(char *);
++  OBAPI void InvertCase(std::string&, int);
++  OBAPI void InvertCase(char *);
++  //! "Clean" the supplied atom type
++  OBAPI void CleanAtomType(char*);
++  //@}
++
++  //! Comparison -- returns true if first parameter less than second
++  //! \return True if @p a < @p b, False otherwise.
++  OBAPI bool OBCompareInt(const int &a,const int &b);
++  //! Comparison -- returns true if first parameter less than second
++  //! \return True if @p a < @p b, False otherwise.
++  OBAPI bool OBCompareUnsigned(const unsigned int &a,const unsigned int &b);
++  /*! "Safe" comparison for floats/doubles: returns fabs(a - b) < epsilon
++   * This function really doesn't make any sense w.r.t. floating-point
++   * representation, so you should never use it. It is provided only for
++   * backwards compatibility.
++   * \deprecated Use IsApprox() instead
++   */
++  OBAPI bool IsNear(const double &, const double &, const double epsilon=2e-6);
++  /*! "Safe" comparison for floats/doubles: true if a is less than epsilon
++   * This function really doesn't make any sense w.r.t. floating-point
++   * representation, so you should never use it. It is provided only for
++   * backwards compatibility.
++   * \deprecated
++   */
++  OBAPI bool IsNearZero(const double &, const double epsilon=2e-6);
++  OBAPI bool IsNan(const double &);
++  /**
++   * \return true if \a a is much smaller than \a b. More precisely:
++   * @code
++   return( fabs(a) <= precision * fabs(b) );
++   * @endcode
++   */
++  OBAPI inline bool IsNegligible(const double & a, const double & b,
++                                 const double precision = 1e-11)
++  {
++    return( fabs(a) <= precision * fabs(b) );
++  }
++  /*! Safe comparison for floats/doubles: true if
++   * fabs(a - b) <= precision * std::min( fabs(a), fabs(b) )
++   * The parameter precision plays the role of 10^-N where N is the number of
++   * significant digits to consider.
++   * This is the correct way to replace operator== for doubles. For new code,
++   * use this function instead of the old IsNear() function.
++   *
++   * \note To check
++   * if x is zero, use
++   * @code
++   IsNegligible( x, 1.0)
++   * @endcode
++   * instead of
++   * @code
++   IsApprox( x, 0.0 )
++   * @endcode
++   */
++  OBAPI inline bool IsApprox(const double & a, const double & b,
++                             const double precision = 1e-11)
++  {
++    return( fabs(a - b) <= precision * std::min<const double>( fabs(a), fabs(b) ) );
++  }
++  //! Same as IsApprox(), but only for positive numbers. Faster.
++  OBAPI inline bool IsApprox_pos(const double &a, const double &b,
++                                 const double precision = 1e-11)
++  {
++    return( fabs(a - b) <= precision * std::min<const double>( a, b ) );
++  }
++  /*! \brief Tests whether its argument can be squared without triggering
++    an overflow or underflow.
++  */
++  OBAPI bool CanBeSquared(const double &);
++
++  OBAPI bool SafeOpen(std::ifstream &fs, const char *filename);
++  OBAPI bool SafeOpen(std::ofstream &fs, const char *filename);
++#endif
++  // (end part to be skipped by SWIG)
++
++  //******************triple template*************************
++  //! \class triple obutil.h <openbabel/obutil.h>
++  //! \brief A 3-element templated, based on the design of the STL pair<>
++  template <class T1, class T2, class T3>
++    struct triple
++    {
++      //type names for the values
++      typedef T1 first_type;
++      typedef T2 second_type;
++      typedef T3 third_type;
++
++      //member
++      T1 first;
++      T2 second;
++      T3 third;
++
++      /** Default constructor
++       *	T1() and T2() and T3() force initialization for built in types
++       **/
++    triple():
++      first(T1()),second(T2()),third(T3())
++      {}
++
++      //! Constructor for 3 values
++    triple(const T1 &a, const T2 &b, const T3 &c):
++      first(a), second(b), third(c)
++      {}
++
++      //! Copy constructor with implicit conversions
++      template<class U, class V, class W>
++        triple(const triple<U,V,W> &t):
++        first(t.first), second(t.second), third(t.third)
++      {}
++
++    };
++
++  //**************quad template********************
++  //! \class quad obutil.h <openbabel/obutil.h>
++  //! \brief A 4-element templated, based on the design of the STL pair<>
++  template <class T1, class T2, class T3, class T4>
++    struct quad
++    {
++      //type names for the values
++      typedef T1 first_type;
++      typedef T2 second_type;
++      typedef T3 third_type;
++      typedef T4 fourth_type;
++
++      //member
++      T1 first;
++      T2 second;
++      T3 third;
++      T4 fourth;
++
++      /*! default constructor
++       *	T1() and T2() and T3() force initialization for built in types
++       */
++    quad():
++      first(T1()),second(T2()),third(T3()),fourth(T4())
++      {}
++
++      //! constructor for 3 values
++    quad(const T1 &a, const T2 &b, const T3 &c, const T4 &d):
++      first(a), second(b), third(c), fourth(d)
++      {}
++
++      //! copy constructor with implicit conversions
++      template<class U, class V, class W, class X>
++        quad(const quad<U,V,W,X> &q):
++        first(q.first), second(q.second), third(q.third), fourth(q.fourth)
++      {}
++
++    };
++
++} // end namespace OpenBabel
++
++#endif // OBUTIL_H
++
++//! \file obutil.h
++//! \brief Various utility methods.
+diff -urN openbabel-2.3.2/include/openbabel/plugin.h openbabel-2.3.2-gg/include/openbabel/plugin.h
+--- openbabel-2.3.2/include/openbabel/plugin.h	2012-10-03 21:08:17.000000000 +0200
++++ openbabel-2.3.2-gg/include/openbabel/plugin.h	2025-10-24 12:13:34.526445902 +0200
+@@ -37,7 +37,7 @@
+ ///@{
+ 
+ /// @brief Case insensitive string comparison for PluginMapType key.
+-struct OBERROR CharPtrLess : public std::binary_function<const char*,const char*, bool>
++struct OBERROR CharPtrLess 
+ {
+   bool operator()(const char* p1,const char* p2) const
+   { return strcasecmp(p1,p2)<0; }
+@@ -549,6 +549,8 @@
+   // charges
+   OB_STATIC_PLUGIN(GasteigerCharges, theGasteigerCharges)
+   OB_STATIC_PLUGIN(MMFF94Charges, theMMFF94Charges)
++  // added by GG
++  OB_STATIC_PLUGIN(EEMCharges, theEEMCharges)
+ #ifdef HAVE_EIGEN
+   OB_STATIC_PLUGIN(QEqCharges, theQEqCharges)
+   OB_STATIC_PLUGIN(QTPIECharges, theQTPIECharges)
+diff -urN openbabel-2.3.2/include/openbabel/shared_ptr.h openbabel-2.3.2-gg/include/openbabel/shared_ptr.h
+--- openbabel-2.3.2/include/openbabel/shared_ptr.h	2011-10-12 22:24:02.000000000 +0200
++++ openbabel-2.3.2-gg/include/openbabel/shared_ptr.h	2025-10-24 12:13:34.526445902 +0200
+@@ -21,10 +21,10 @@
+   #define shared_ptr boost::shared_ptr
+ #else
+   #include <memory>
+-  #if __GNUC__ == 4  //&& __GNUC_MINOR__ < 3  removed at the suggestion of Konstantin Tokarev
+-    #include <tr1/memory>
++  #if __GNUC__ >= 4  //&& __GNUC_MINOR__ < 3  removed at the suggestion of Konstantin Tokarev
++    #include <memory>
+   #endif
+-  using std::tr1::shared_ptr;
++  using std::shared_ptr;
+ #endif
+ 
+ #endif // OB_SHARED_PTR_H
+diff -urN openbabel-2.3.2/include/openbabel/shared_ptr.h~ openbabel-2.3.2-gg/include/openbabel/shared_ptr.h~
+--- openbabel-2.3.2/include/openbabel/shared_ptr.h~	1970-01-01 01:00:00.000000000 +0100
++++ openbabel-2.3.2-gg/include/openbabel/shared_ptr.h~	2025-10-24 12:13:34.526445902 +0200
+@@ -0,0 +1,33 @@
++/**********************************************************************
++shared_ptr.h - shared_ptr class.
++
++Copyright (C) Copyright (C) 2007 by Chris Morley
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation version 2 of the License.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++***********************************************************************/
++
++#ifndef OB_SHARED_PTR_H
++#define OB_SHARED_PTR_H
++
++#ifdef USE_BOOST
++  #include <boost/shared_ptr.hpp>
++  #define shared_ptr boost::shared_ptr
++#else
++  #include <memory>
++  #if __GNUC__ >= 4  //&& __GNUC_MINOR__ < 3  removed at the suggestion of Konstantin Tokarev
++    #include <tr1/memory>
++  #endif
++  using std::tr1::shared_ptr;
++#endif
++
++#endif // OB_SHARED_PTR_H
++
++/// @file shared_ptr.h
++/// @brief Shared pointer.
+diff -urN openbabel-2.3.2/src/atom.cpp openbabel-2.3.2-gg/src/atom.cpp
+--- openbabel-2.3.2/src/atom.cpp	2012-10-03 21:08:15.000000000 +0200
++++ openbabel-2.3.2-gg/src/atom.cpp	2025-10-24 12:13:34.527445915 +0200
+@@ -886,6 +886,12 @@
+     //    vector<OBAtom*>::iterator i;
+     OBBondIterator j,k;
+ 
++    // check wheter we are in a periodic system (GG)
++    OBUnitCell *uc = NULL;
++    OBMol *mol = (OBMol*)GetParent();
++    if (mol->HasData(OBGenericDataType::UnitCell))
++      uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
++
+     minDegrees = 360.0;
+ 
+     for (b = BeginNbrAtom(j); b; b = NextNbrAtom(j))
+@@ -895,6 +901,13 @@
+           {
+             v1 = b->GetVector() - GetVector();
+             v2 = c->GetVector() - GetVector();
++
++	    // get the minimum image if we are in a periodic system (GG)
++	    if(uc) {
++	      v1 = uc->MinimumImage(v1);
++	      v2 = uc->MinimumImage(v2);
++	    }
++
+             degrees = vectorAngle(v1, v2);
+             if (degrees < minDegrees)
+               minDegrees = degrees;
+@@ -912,6 +925,12 @@
+     OBBondIterator j,k;
+     int n=0;
+ 
++    // check if we are in a periodic system (GG)
++    OBUnitCell *uc = NULL;
++    OBMol *mol = (OBMol*)GetParent();
++    if (mol->HasData(OBGenericDataType::UnitCell))
++      uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
++    
+     avgDegrees = 0.0;
+ 
+     for (b = BeginNbrAtom(j); b; b = NextNbrAtom(j))
+@@ -921,6 +940,12 @@
+           {
+             v1 = b->GetVector() - GetVector();
+             v2 = c->GetVector() - GetVector();
++
++	    // get the minimum image (GG)
++	    if(uc) {
++	      v1 = uc->MinimumImage(v1);
++	      v2 = uc->MinimumImage(v2);
++	    }
+             degrees = vectorAngle(v1, v2);
+             avgDegrees += degrees;
+             n++;
+@@ -1077,21 +1102,48 @@
+ 
+   double OBAtom::GetDistance(OBAtom *b)
+   {
+-    return(( this->GetVector() - b->GetVector() ).length());
++    // changed to work in a periodic environment
++    vector3 origin = this->GetVector();
++    vector3 vatom  = b->GetVector();
++    vector3 dist = vatom - origin;
++
++    OBUnitCell *uc = NULL;
++    OBMol *mol = (OBMol*)GetParent();
++    if (mol->HasData(OBGenericDataType::UnitCell))
++      {
++	uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
++	dist = uc->MinimumImage(dist);
++      }
++    
++    return(dist.length());
+   }
+ 
+   double OBAtom::GetDistance(int b)
+   {
++    // changed by GG - it's a wrapper to the function above
+     OBMol *mol = (OBMol*)GetParent();
+-    return(( this->GetVector() - mol->GetAtom(b)->GetVector() ).length());
++    return(GetDistance(mol->GetAtom(b)));
++    //return(( this->GetVector() - mol->GetAtom(b)->GetVector() ).length());
+   }
+ 
+   double OBAtom::GetAngle(OBAtom *b, OBAtom *c)
+   {
+     vector3 v1,v2;
++    OBUnitCell *uc = NULL;
++    OBMol *mol = (OBMol*)GetParent();
+ 
+     v1 = this->GetVector() - b->GetVector();
+-    v2 = c->GetVector() - b->GetVector();
++    v2 =    c->GetVector() - b->GetVector();
++
++    // see if we are in a periodic system (GG)
++    if (mol->HasData(OBGenericDataType::UnitCell))
++      {
++	uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
++	v1 = uc->MinimumImage(v1);
++	v2 = uc->MinimumImage(v2);
++      }
++    
++
+     if (IsNearZero(v1.length(), 1.0e-3)
+       || IsNearZero(v2.length(), 1.0e-3)) {
+         return(0.0);
+@@ -1102,18 +1154,11 @@
+ 
+   double OBAtom::GetAngle(int b, int c)
+   {
++    // this is now a wrapper to the function above (GG)
+     OBMol *mol = (OBMol*)GetParent();
+-    vector3 v1,v2;
+-
+-    v1 = this->GetVector() - mol->GetAtom(b)->GetVector();
+-    v2 = mol->GetAtom(c)->GetVector() - mol->GetAtom(b)->GetVector();
+-
+-    if (IsNearZero(v1.length(), 1.0e-3)
+-      || IsNearZero(v2.length(), 1.0e-3)) {
+-        return(0.0);
+-    }
+-
+-    return(vectorAngle(v1, v2));
++    OBAtom *a1 = mol->GetAtom(b);
++    OBAtom *a2 = mol->GetAtom(c);
++    return(GetAngle(a1,a2));
+   }
+ 
+   bool OBAtom::GetNewBondVector(vector3 &v,double length)
+diff -urN openbabel-2.3.2/src/bond.cpp openbabel-2.3.2-gg/src/bond.cpp
+--- openbabel-2.3.2/src/bond.cpp	2010-10-19 16:05:07.000000000 +0200
++++ openbabel-2.3.2-gg/src/bond.cpp	2025-10-24 12:13:34.527445915 +0200
+@@ -728,12 +728,28 @@
+   {
+     double	d2;
+     const OBAtom *begin, *end;
++    OBUnitCell *uc = NULL;
++    OBMol *mol;
++    
+     begin = GetBeginAtom();
+     end = GetEndAtom();
+ 
+-    d2 = SQUARE(begin->GetX() - end->GetX());
+-    d2 += SQUARE(begin->GetY() - end->GetY());
+-    d2 += SQUARE(begin->GetZ() - end->GetZ());
++    // check if we are in a periodic system (GG)
++    mol = ((OBAtom *)begin)->GetParent();
++    if (mol->HasData(OBGenericDataType::UnitCell))
++      {
++	vector3 va, vb, vd;
++     	uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
++	va = begin->GetVector();
++	vb = end->GetVector();
++	vd = uc->MinimumImage(va-vb);
++	d2 = vd.length_2();
++      }
++    else {
++      d2 = SQUARE(begin->GetX() - end->GetX());
++      d2 += SQUARE(begin->GetY() - end->GetY());
++      d2 += SQUARE(begin->GetZ() - end->GetZ());
++    }
+ 
+     return(sqrt(d2));
+   }
+diff -urN openbabel-2.3.2/src/charges/qtpie.cpp openbabel-2.3.2-gg/src/charges/qtpie.cpp
+--- openbabel-2.3.2/src/charges/qtpie.cpp	2012-10-03 21:07:56.000000000 +0200
++++ openbabel-2.3.2-gg/src/charges/qtpie.cpp	2025-10-24 12:13:34.527445915 +0200
+@@ -103,7 +103,7 @@
+   */
+ 
+ /////////////////////////////////////////////////////////////////
+-QTPIECharges theQTPIECharges("qtpie"); //Global instance
++  QTPIECharges theQTPIECharges("qtpie"); //Global instance
+ 
+ /////////////////////////////////////////////////////////////////
+ 
+diff -urN openbabel-2.3.2/src/forcefields/forcefielduff.cpp openbabel-2.3.2-gg/src/forcefields/forcefielduff.cpp
+--- openbabel-2.3.2/src/forcefields/forcefielduff.cpp	2012-10-03 21:07:57.000000000 +0200
++++ openbabel-2.3.2-gg/src/forcefields/forcefielduff.cpp	2025-10-24 12:13:34.527445915 +0200
+@@ -45,13 +45,39 @@
+       return;
+     }
+ 
+-    vector3 vab, da, db;
++    // changed to consider the minimum image convention (GG)
++    vector3 da, db;
+     double delta2, dE;
++    OBMol *mol = a->GetParent();
++    OBUnitCell *uc;
++    double my_pos_a[3], my_pos_b[3];
++    
++    da = pos_a;
++    db = pos_b;
++
++    //cout << "pos_a: " << pos_a[0] << " " << pos_a[1] << " " << pos_a[2] << endl;
++    //cout << "pos_b: " << pos_b[0] << " " << pos_b[1] << " " << pos_b[2] << endl;
++
++    if (mol->HasData(OBGenericDataType::UnitCell))
++      {
++     	uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
++     	db = uc->MinimumImage(db - da);
++     	da.Set(0.0, 0.0, 0.0);	
++      }
++    
++    for(int i=0;i<3;i++) {
++      my_pos_a[i] = da[i];
++      my_pos_b[i] = db[i];
++    }
+ 
+     if (gradients) {
+-      rab = OBForceField::VectorBondDerivative(pos_a, pos_b, force_a, force_b);
++      //rab = OBForceField::VectorBondDerivative(pos_a, pos_b, force_a, force_b);
++      rab = OBForceField::VectorBondDerivative(my_pos_a, my_pos_b, force_a, force_b);
++      //cout << "rab: " << rab << endl;
++
+     } else {
+-      rab = OBForceField::VectorDistance(pos_a, pos_b);
++      //rab = OBForceField::VectorDistance(pos_a, pos_b);
++      rab = OBForceField::VectorDistance(my_pos_a, my_pos_b);
+     }
+ 
+     delta = rab - r0; // we pre-compute the r0 below
+@@ -89,15 +115,18 @@
+       }
+ 
+       IF_OBFF_LOGLVL_HIGH {
+-        snprintf(_logbuf, BUFF_SIZE, "%-5s %-5s  %4.2f%8.3f   %8.3f     %8.3f   %8.3f   %8.3f\n",
+-                 (*i).a->GetType(), (*i).b->GetType(),
+-                 (*i).bt, (*i).rab, (*i).r0, (*i).kb, (*i).delta, (*i).energy);
++        //snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u  %4.2f%8.3f   %8.3f     %8.3f   %8.3f   %8.4f\n",
++        //         (*i).a->GetIdx(), (*i).b->GetIdx(),
++        //         (*i).bt, (*i).rab, (*i).r0, (*i).kb, (*i).delta, (*i).energy);
++        snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u  %5.3f  %10.4f  %6.4f\n",
++                 (*i).a->GetIdx(), (*i).b->GetIdx(),
++                 (*i).bt, (*i).kb, (*i).r0);
+         OBFFLog(_logbuf);
+       }
+     }
+ 
+     IF_OBFF_LOGLVL_MEDIUM {
+-      snprintf(_logbuf, BUFF_SIZE, "     TOTAL BOND STRETCHING ENERGY = %8.3f %s\n",  energy, GetUnit().c_str());
++      snprintf(_logbuf, BUFF_SIZE, "TOTAL BOND STRETCHING ENERGY = %8.3f %s\n",  energy, GetUnit().c_str());
+       OBFFLog(_logbuf);
+     }
+     return energy;
+@@ -111,11 +140,40 @@
+       return;
+     }
+ 
++    // changed to consider the minimum image convention (GG)
++    OBMol *mol = a->GetParent();
++    OBUnitCell *uc;
++
+     vector3 da, db, dc;
+-		double dE;
++    double dE;
++
++    da = pos_a;
++    db = pos_b;
++    dc = pos_c;
+ 
+     if (gradients) {
+-      theta = OBForceField::VectorAngleDerivative(pos_a, pos_b, pos_c, force_a, force_b, force_c);
++      double my_pos_a[3], my_pos_b[3], my_pos_c[3];
++
++      if(mol->HasData(OBGenericDataType::UnitCell))
++      {
++     	uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
++     	db = uc->MinimumImage(db - da);
++     	dc = uc->MinimumImage(dc - da);
++     	da.Set(0.0, 0.0, 0.0);	
++      } else {
++	da = pos_a;
++	db = pos_b;
++	dc = pos_c;
++      }
++    
++      for(int i=0;i<3;i++) {
++	my_pos_a[i] = da[i];
++	my_pos_b[i] = db[i];
++	my_pos_c[i] = dc[i];
++      }
++
++      
++      theta = OBForceField::VectorAngleDerivative(my_pos_a, my_pos_b, my_pos_c, force_a, force_b, force_c);
+ 
+       if (theta < 2.5 || theta > 355.0) {
+         vector3 v1;
+@@ -126,11 +184,11 @@
+       theta *= DEG_TO_RAD;
+     } else {
+       theta = a->GetAngle(b, c) * DEG_TO_RAD;
+-		}
+-
++    }
++    
+     if (!isfinite(theta))
+       theta = 0.0; // doesn't explain why GetAngle is returning NaN but solves it for us
+-
++    
+     double cosT = cos(theta);
+     switch (coord) {
+     case 1: // sp -- linear case, minima at 180 degrees, max (amplitude 2*ka) at 0, 360
+@@ -196,8 +254,8 @@
+ 
+     IF_OBFF_LOGLVL_HIGH {
+       OBFFLog("\nA N G L E   B E N D I N G\n\n");
+-      OBFFLog("ATOM TYPES       VALENCE     IDEAL      FORCE\n");
+-      OBFFLog(" I    J    K      ANGLE      ANGLE     CONSTANT      DELTA      ENERGY\n");
++      OBFFLog("ATOM TYPES                   IDEAL      FORCE\n");
++      OBFFLog(" I    J    K      COORD      ANGLE     CONSTANT      C1    C2  ENERGY\n");
+       OBFFLog("-----------------------------------------------------------------------------\n");
+     }
+ 
+@@ -213,14 +271,19 @@
+       }
+ 
+       IF_OBFF_LOGLVL_HIGH {
+-        snprintf(_logbuf, BUFF_SIZE, "%-5s %-5s %-5s%8.3f  %8.3f     %8.3f   %8.3f   %8.3f\n", (*i).a->GetType(), (*i).b->GetType(),
+-                 (*i).c->GetType(), (*i).theta * RAD_TO_DEG, (*i).theta0, (*i).ka, (*i).delta, (*i).energy);
++        //snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u %-5u %d  %8.3f   %8.3f  %8.3f  %8.3f   %8.4f\n", 
++        //         (*i).a->GetIdx(), (*i).b->GetIdx(), (*i).c->GetIdx(), 
++        //         (*i).coord, (*i).theta0, (*i).ka, (*i).c1, (*i).c2, (*i).energy);
++
++        snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u %-5u   %d   %10.4f   %8.4f  %8.4f  %8.4f\n", 
++                 (*i).a->GetIdx(), (*i).b->GetIdx(), (*i).c->GetIdx(), 
++                 (*i).coord, (*i).ka, (*i).c0, (*i).c1, (*i).c2);
+         OBFFLog(_logbuf);
+       }
+     }
+ 
+     IF_OBFF_LOGLVL_MEDIUM {
+-      snprintf(_logbuf, BUFF_SIZE, "     TOTAL ANGLE BENDING ENERGY = %8.3f %s\n", energy, GetUnit().c_str());
++      snprintf(_logbuf, BUFF_SIZE, "TOTAL ANGLE BENDING ENERGY = %8.3f %s\n", energy, GetUnit().c_str());
+       OBFFLog(_logbuf);
+     }
+     return energy;
+@@ -234,21 +297,57 @@
+       return;
+     }
+ 
++    // changed to consider the minimum image convention (GG)
+     vector3 da, db, dc, dd;
+     double cosine;
+     double dE;
++    OBMol *mol = a->GetParent();
++    OBUnitCell *uc;
++
++    da = pos_a;
++    db = pos_b;
++    dc = pos_c;
++    dd = pos_d;
+ 
+     if (gradients) {
+-      tor = OBForceField::VectorTorsionDerivative(pos_a, pos_b, pos_c, pos_d,
++      double my_pos_a[3], my_pos_b[3], my_pos_c[3], my_pos_d[3];
++      if (mol->HasData(OBGenericDataType::UnitCell))	{
++	uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
++     	dd = uc->MinimumImage(dd - da);
++     	dc = uc->MinimumImage(dc - da);
++     	db = uc->MinimumImage(db - da);
++     	da.Set(0.0, 0.0, 0.0);	 
++      }
++
++      for(int i=0;i<3;i++) {
++	my_pos_a[i] = da[i];
++	my_pos_b[i] = db[i];
++	my_pos_c[i] = dc[i];
++	my_pos_d[i] = dd[i];
++      }
++
++
++      tor = OBForceField::VectorTorsionDerivative(my_pos_a, my_pos_b, my_pos_c, my_pos_d,
+                                                   force_a, force_b, force_c, force_d);
+       if (!isfinite(tor))
+         tor = 1.0e-3;
+       tor *= DEG_TO_RAD;
+     } else {
++
+       vector3 vab, vbc, vcd, abbc, bccd;
+       vab = a->GetVector() - b->GetVector();
+       vbc = b->GetVector() - c->GetVector();
+       vcd = c->GetVector() - d->GetVector();
++
++      if (mol->HasData(OBGenericDataType::UnitCell))
++	{
++          uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
++          vab = uc->MinimumImage(vab);
++          vbc = uc->MinimumImage(vbc);
++          vcd = uc->MinimumImage(vcd);
++        }
++      
++
+       abbc = cross(vab, vbc);
+       bccd = cross(vbc, vcd);
+ 
+@@ -282,9 +381,9 @@
+ 
+     IF_OBFF_LOGLVL_HIGH {
+       OBFFLog("\nT O R S I O N A L\n\n");
+-      OBFFLog("----ATOM TYPES-----    FORCE         TORSION\n");
+-      OBFFLog(" I    J    K    L     CONSTANT        ANGLE         ENERGY\n");
+-      OBFFLog("----------------------------------------------------------------\n");
++      OBFFLog("----ATOM TYPES-----    FORCE           COS\n");
++      OBFFLog(" I    J    K    L     CONSTANT        NPHI0         N      ENERGY\n");
++      OBFFLog("-----------------------------------------------------------------\n");
+     }
+ 
+     for (i = _torsioncalculations.begin(); i != _torsioncalculations.end(); ++i) {
+@@ -300,16 +399,20 @@
+       }
+ 
+       IF_OBFF_LOGLVL_HIGH {
+-        snprintf(_logbuf, BUFF_SIZE, "%-5s %-5s %-5s %-5s%6.3f       %8.3f     %8.3f\n",
+-                 (*i).a->GetType(), (*i).b->GetType(),
+-                 (*i).c->GetType(), (*i).d->GetType(), (*i).V,
+-                 (*i).tor * RAD_TO_DEG, (*i).energy);
++        //snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u %-5u %-5u%6.3f  %8.3f %d %8.4f\n",
++        //         (*i).a->GetIdx(), (*i).b->GetIdx(),
++        //         (*i).c->GetIdx(), (*i).d->GetIdx(), (*i).V,
++        //         (*i).cosNPhi0, (*i).n, (*i).energy);
++        snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u %-5u %-5u  %8.4f  %8.4f %d\n",
++                 (*i).a->GetIdx(), (*i).b->GetIdx(),
++                 (*i).c->GetIdx(), (*i).d->GetIdx(), 
++		 (*i).V, (*i).cosNPhi0, (*i).n);
+         OBFFLog(_logbuf);
+       }
+     }
+ 
+     IF_OBFF_LOGLVL_MEDIUM {
+-      snprintf(_logbuf, BUFF_SIZE, "     TOTAL TORSIONAL ENERGY = %8.3f %s\n", energy, GetUnit().c_str());
++      snprintf(_logbuf, BUFF_SIZE, "TOTAL TORSIONAL ENERGY = %8.3f %s\n", energy, GetUnit().c_str());
+       OBFFLog(_logbuf);
+     }
+ 
+@@ -331,11 +434,41 @@
+       return;
+     }
+ 
++    // changed to consider the minimum image convention (GG)
+     vector3 da, db, dc, dd;
+     double dE;
++    OBMol *mol = a->GetParent();
++    OBUnitCell *uc;
++
++    da = pos_a;
++    db = pos_b;
++    dc = pos_c;
++    dd = pos_d;
+ 
+     if (gradients) {
+-      angle = OBForceField::VectorOOPDerivative(pos_a, pos_b, pos_c, pos_d,
++      double my_pos_a[3], my_pos_b[3], my_pos_c[3], my_pos_d[3];
++
++      if (mol->HasData(OBGenericDataType::UnitCell))	{
++	uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
++     	dd = uc->MinimumImage(dd - da);
++     	dc = uc->MinimumImage(dc - da);
++     	db = uc->MinimumImage(db - da);
++     	da.Set(0.0, 0.0, 0.0);	 
++      } else {
++	da = pos_a;
++	db = pos_b;
++	dc = pos_c;
++	dd = pos_d;
++      }
++
++      for(int i=0;i<3;i++) {
++	my_pos_a[i] = da[i];
++	my_pos_b[i] = db[i];
++	my_pos_c[i] = dc[i];
++	my_pos_d[i] = dd[i];
++      }
++
++      angle = OBForceField::VectorOOPDerivative(my_pos_a, my_pos_b, my_pos_c, my_pos_d,
+                                                 force_a, force_b, force_c, force_d);
+       angle *= DEG_TO_RAD;
+ 
+@@ -349,7 +482,7 @@
+       OBForceField::VectorSelfMultiply(force_c, dE);
+       OBForceField::VectorSelfMultiply(force_d, dE);
+     } else {
+-      angle = DEG_TO_RAD*Point2PlaneAngle(d->GetVector(), a->GetVector(), b->GetVector(), c->GetVector());
++      angle = DEG_TO_RAD*Point2PlaneAngle(da,db,dc,dd);
+       if (!isfinite(angle))
+         angle = 0.0; // doesn't explain why GetAngle is returning NaN but solves it for us;
+     }
+@@ -365,8 +498,8 @@
+ 
+     IF_OBFF_LOGLVL_HIGH {
+       OBFFLog("\nO U T - O F - P L A N E   B E N D I N G\n\n");
+-      OBFFLog("ATOM TYPES                 OOP     FORCE \n");
+-      OBFFLog(" I    J     K     L       ANGLE   CONSTANT     ENERGY\n");
++      OBFFLog("ATOM TYPES             FORCE \n");
++      OBFFLog(" I    J     K     L   CONSTANT   C0    C1    C2    ENERGY\n");
+       OBFFLog("----------------------------------------------------------\n");
+     }
+ 
+@@ -382,14 +515,18 @@
+       }
+ 
+       IF_OBFF_LOGLVL_HIGH {
+-        snprintf(_logbuf, BUFF_SIZE, "%-5s %-5s %-5s %-5s%8.3f   %8.3f     %8.3f\n", (*i).a->GetType(), (*i).b->GetType(), (*i).c->GetType(), (*i).d->GetType(),
+-                 (*i).angle * RAD_TO_DEG, (*i).koop, (*i).energy);
++        //snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u %-5u %-5u%8.3f %8.3f %8.3f %8.3f %8.4f\n", 
++        //         (*i).a->GetIdx(), (*i).b->GetIdx(), (*i).c->GetIdx(), (*i).d->GetIdx(),
++        //         (*i).koop, (*i).c0, (*i).c1, (*i).c2, (*i).energy);
++        snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u %-5u %-5u%8.3f %8.3f %8.3f %8.3f\n", 
++                 (*i).a->GetIdx(), (*i).b->GetIdx(), (*i).c->GetIdx(), (*i).d->GetIdx(),
++                 (*i).koop, (*i).c0, (*i).c1, (*i).c2);
+         OBFFLog(_logbuf);
+       }
+     }
+ 
+     IF_OBFF_LOGLVL_HIGH {
+-      snprintf(_logbuf, BUFF_SIZE, "     TOTAL OUT-OF-PLANE BENDING ENERGY = %8.3f %s\n", energy, GetUnit().c_str());
++      snprintf(_logbuf, BUFF_SIZE, "TOTAL OUT-OF-PLANE BENDING ENERGY = %8.3f %s\n", energy, GetUnit().c_str());
+       OBFFLog(_logbuf);
+     }
+     return energy;
+@@ -403,28 +540,57 @@
+       return;
+     }
+ 
++    // changed to consider the minimum image convention (GG)
+     vector3 da, db;
+     double term6, term12, dE, term7, term13, rabSquared = 0.0;
++    OBMol *mol = a->GetParent();
++    OBUnitCell *uc = NULL;
++    double my_pos_a[3], my_pos_b[3];
++    
++    for(int c=0;c<3;c++) 
++      {
++	my_pos_a[c] = pos_a[c];
++	my_pos_b[c] = pos_b[c];
++      }
++    
++    // check the presence of a unit cell
++    if (mol->HasData(OBGenericDataType::UnitCell))
++      {
++	uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
++	
++	db.SetX(pos_b[0] - pos_a[0]);
++	db.SetY(pos_b[1] - pos_a[1]);
++	db.SetZ(pos_b[2] - pos_a[2]);
++
++	db = uc->MinimumImage(db);
++	for(int c=0;c<3;c++) 
++	  {
++	    my_pos_b[c] = db[c];
++	    my_pos_a[c] = 0.0;
++	  }
++      } 
+ 
+     if (gradients) {
+-      rab = OBForceField::VectorDistanceDerivative(pos_a, pos_b, force_a, force_b);
+-
+-      if (rab < 1.0e-3)
+-        rab = 1.0e-3;
+-
++      
++      rab = OBForceField::VectorDistanceDerivative(my_pos_a, my_pos_b,force_a, force_b);	
++      if (rab < 1.0e-3) rab = 1.0e-3;	
+       rabSquared = SQUARE(rab);
++
+     } else {
+       // Get distance squared (saves a sqrt and multiply)
+       // for every energy evaluation
+       double ab[3];
++
+       for (unsigned int c = 0; c < 3; ++c)
+-        rabSquared += SQUARE(a->GetCoordinate()[c] - b->GetCoordinate()[c]);
++	rabSquared += SQUARE(my_pos_a[c] - my_pos_b[c]);
++      
++      // original line in the for loop was:
++      // rabSquared += SQUARE(a->GetCoordinate()[c] - b->GetCoordinate()[c]);
+ 
+       // make sure the energy doesn't blow up
+-      if (rabSquared < 1.0e-5)
+-        rabSquared = 1.0e-5;
++      if (rabSquared < 1.0e-5) rabSquared = 1.0e-5;
+     }
+-
++    
+     // TODO: This actually should include zetas (not always exactly 6-12 for VDW paper)
+ 
+     term6 = kaSquared / rabSquared; // ^2
+@@ -442,7 +608,7 @@
+     }
+   }
+ 
+-  template<bool gradients>
++  template<bool gradients> 
+   double OBForceFieldUFF::E_VDW()
+   {
+     vector<OBFFVDWCalculationUFF>::iterator i;
+@@ -451,7 +617,7 @@
+     IF_OBFF_LOGLVL_HIGH {
+       OBFFLog("\nV A N   D E R   W A A L S\n\n");
+       OBFFLog("ATOM TYPES\n");
+-      OBFFLog(" I    J        Rij       kij       ENERGY\n");
++      OBFFLog(" I    J        sij       eij       ENERGY\n");
+       OBFFLog("-----------------------------------------\n");
+       //          XX   XX     -000.000  -000.000  -000.000  -000.000
+     }
+@@ -472,14 +638,15 @@
+       }
+ 
+       IF_OBFF_LOGLVL_HIGH {
+-        snprintf(_logbuf, BUFF_SIZE, "%-5s %-5s %8.3f  %8.3f  %8.3f\n", (*i).a->GetType(), (*i).b->GetType(),
+-                 (*i).rab, (*i).kab, (*i).energy);
++        snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u %8.3f  %8.3f  %8.4f\n", 
++                 (*i).a->GetIdx(), (*i).b->GetIdx(),
++                 (*i).ka, (*i).kab, (*i).energy);
+         OBFFLog(_logbuf);
+       }
+     }
+ 
+     IF_OBFF_LOGLVL_MEDIUM {
+-      snprintf(_logbuf, BUFF_SIZE, "     TOTAL VAN DER WAALS ENERGY = %8.3f %s\n", energy, GetUnit().c_str());
++      snprintf(_logbuf, BUFF_SIZE, "TOTAL VAN DER WAALS ENERGY = %8.3f %s\n", energy, GetUnit().c_str());
+       OBFFLog(_logbuf);
+     }
+ 
+@@ -494,12 +661,23 @@
+       return;
+     }
+ 
++    // changed to consider the minimum image convention (GG)
+     vector3 da, db;
+     double dE, rab2;
++    OBMol *mol = a->GetParent();
++    OBUnitCell *uc;
+ 
+     if (gradients) {
+       da = a->GetVector();
+       db = b->GetVector();
++
++      if (mol->HasData(OBGenericDataType::UnitCell))
++	{
++          uc = (OBUnitCell*)mol->GetData(OBGenericDataType::UnitCell);
++          db = uc->MinimumImage(db-da);
++          da.Set(0.0, 0.0, 0.0);
++        }
++      
+       rab = OBForceField::VectorLengthDerivative(da, db);
+     } else
+       rab = a->GetDistance(b);
+@@ -549,7 +727,7 @@
+       }
+ 
+       IF_OBFF_LOGLVL_HIGH {
+-        snprintf(_logbuf, BUFF_SIZE, "%-5s %-5s   %8.3f  %8.3f  %8.3f\n", (*i).a->GetType(), (*i).b->GetType(),
++        snprintf(_logbuf, BUFF_SIZE, "%-5u %-5u   %8.3f  %8.3f  %8.3f\n", (*i).a->GetIdx(), (*i).b->GetIdx(),
+                  (*i).rab, (*i).qq, (*i).energy);
+         OBFFLog(_logbuf);
+       }
+@@ -1125,6 +1303,10 @@
+     double phi0 = 0.0;
+ 
+     double vi, vj;
++    int equivalent_torsions;
++    OBAtom *b2, *c2;
++    OBTorsion *t2;
++
+     FOR_TORSIONS_OF_MOL(t, _mol) {
+       a = _mol.GetAtom((*t)[0] + 1);
+       b = _mol.GetAtom((*t)[1] + 1);
+@@ -1148,6 +1330,15 @@
+           continue;
+       }
+ 
++      // find equivalent torsions (GG)
++      equivalent_torsions = 0;
++      FOR_TORSIONS_OF_MOL(t2, _mol) {
++	b2 = _mol.GetAtom((*t2)[1] + 1);
++	c2 = _mol.GetAtom((*t2)[2] + 1);
++	if(((b2 == b) && (c2 == c)) ||
++	   ((b2 == c) && (c2 == b))) equivalent_torsions++;
++      }
++
+       OBBond *bc = _mol.GetBond(b, c);
+       torsiontype = bc->GetBondOrder();
+       if (bc->IsAromatic())
+@@ -1256,6 +1447,8 @@
+ 
+       // still need to implement special case of sp2-sp3 with sp2-sp2
+ 
++      torsioncalc.V /= (double)equivalent_torsions;
++      torsioncalc.Phi0 = phi0; // need it for setting up the force field (GG)
+       torsioncalc.cosNPhi0 = cos(torsioncalc.n * DEG_TO_RAD * phi0);
+       torsioncalc.SetupPointers();
+       _torsioncalculations.push_back(torsioncalc);
+@@ -1404,43 +1597,53 @@
+     IF_OBFF_LOGLVL_LOW
+       OBFFLog("SETTING UP VAN DER WAALS CALCULATIONS...\n");
+ 
+-    FOR_PAIRS_OF_MOL(p, _mol) {
+-      a = _mol.GetAtom((*p)[0]);
+-      b = _mol.GetAtom((*p)[1]);
+-
+-      // skip this vdw if the atoms are ignored
+-      if ( _constraints.IsIgnored(a->GetIdx()) || _constraints.IsIgnored(b->GetIdx()) )
+-        continue;
+-
+-      // if there are any groups specified, check if the two atoms are in a single _interGroup or if
+-      // two two atoms are in one of the _interGroups pairs.
+-      if (HasGroups()) {
+-        bool validVDW = false;
+-        for (unsigned int i=0; i < _interGroup.size(); ++i) {
+-          if (_interGroup[i].BitIsOn(a->GetIdx()) && _interGroup[i].BitIsOn(b->GetIdx()))
+-            validVDW = true;
+-        }
+-        for (unsigned int i=0; i < _interGroups.size(); ++i) {
+-          if (_interGroups[i].first.BitIsOn(a->GetIdx()) && _interGroups[i].second.BitIsOn(b->GetIdx()))
+-            validVDW = true;
+-          if (_interGroups[i].first.BitIsOn(b->GetIdx()) && _interGroups[i].second.BitIsOn(a->GetIdx()))
+-            validVDW = true;
+-        }
+-
+-        if (!validVDW)
+-          continue;
+-      }
+-
+-      if (a->IsConnected(b)) {
+-        continue;
+-      }
+-      if (a->IsOneThree(b)) {
+-        continue;
+-      }
+-
+-      if (SetupVDWCalculation(a, b, vdwcalc)) {
+-        _vdwcalculations.push_back(vdwcalc);
++    // GG had a problem here. For large systems (> 1000 atoms), the
++    // memory requirements for setting up vdW calculations can exceed
++    // many GB. Since I DO need such large systems in obgmx, I skip
++    // this assignment.
++
++    if(_mol.NumAtoms() < 1000) {
++      
++      FOR_PAIRS_OF_MOL(p, _mol) {
++	a = _mol.GetAtom((*p)[0]);
++	b = _mol.GetAtom((*p)[1]);
++	
++	// skip this vdw if the atoms are ignored
++	if ( _constraints.IsIgnored(a->GetIdx()) || _constraints.IsIgnored(b->GetIdx()) )
++	  continue;
++	
++	// if there are any groups specified, check if the two atoms are in a single _interGroup or if
++	// two two atoms are in one of the _interGroups pairs.
++	if (HasGroups()) {
++	  bool validVDW = false;
++	  for (unsigned int i=0; i < _interGroup.size(); ++i) {
++	    if (_interGroup[i].BitIsOn(a->GetIdx()) && _interGroup[i].BitIsOn(b->GetIdx()))
++	      validVDW = true;
++	  }
++	  for (unsigned int i=0; i < _interGroups.size(); ++i) {
++	    if (_interGroups[i].first.BitIsOn(a->GetIdx()) && _interGroups[i].second.BitIsOn(b->GetIdx()))
++	      validVDW = true;
++	    if (_interGroups[i].first.BitIsOn(b->GetIdx()) && _interGroups[i].second.BitIsOn(a->GetIdx()))
++	      validVDW = true;
++	  }
++	  
++	  if (!validVDW)
++	    continue;
++	}
++	
++	if (a->IsConnected(b)) {
++	  continue;
++	}
++	if (a->IsOneThree(b)) {
++	  continue;
++	}
++	
++	if (SetupVDWCalculation(a, b, vdwcalc)) {
++	  _vdwcalculations.push_back(vdwcalc);
++	}
+       }
++    } else {
++      OBFFLog("--- NOT DONE: TOO MANY ATOMS (>1000)\n");
+     }
+ 
+     // NOTE: No electrostatics are set up
+@@ -1840,6 +2043,7 @@
+ 
+     return passed; // did we pass every single component?
+   }
++  
+ 
+ } // end namespace OpenBabel
+ 
+diff -urN openbabel-2.3.2/src/forcefields/forcefielduff.h openbabel-2.3.2-gg/src/forcefields/forcefielduff.h
+--- openbabel-2.3.2/src/forcefields/forcefielduff.h	2012-10-03 21:07:57.000000000 +0200
++++ openbabel-2.3.2-gg/src/forcefields/forcefielduff.h	2025-10-24 12:13:34.528445928 +0200
+@@ -56,6 +56,7 @@
+       int n;
+       double tt; //torsiontype (i.e. b-c bond order)
+       double V, tor, cosNPhi0;
++      double Phi0;
+ 
+       template<bool> void Compute();
+ 
+@@ -198,7 +199,238 @@
+ 
+     //! Compare and print the numerical and analytical gradients
+     bool ValidateGradients();
++    
++    // Calculation of force-field parameters
++    // Redefinition of the virtual functions givin access to
++    // the force-field paramers
++    // (GG)
+ 
++    // The number of different atom types
++    int NAtomTypes()
++    {
++      OBAtom *a;
++      string atype;
++      bool have_it;
++      vector<string>::iterator i;
++
++      if(_natomtypes) return _natomtypes;
++      
++      _atomtype.reserve(_mol.NumAtoms());
++      
++      FOR_ATOMS_OF_MOL(a,_mol) {
++        atype = a->GetType();
++        for(have_it = false, i = _atomtype.begin() ; i != _atomtype.end() ; ++i)
++          if(atype == (*i)) have_it = true;
++        
++        if(!have_it) _atomtype.push_back(atype);
++      }
++      
++      _natomtypes = _atomtype.size();
++      
++      return _natomtypes;
++    }
++
++    // the name of the n-th atom type
++    const char* TypeName(int n) {
++      if(_natomtypes) NAtomTypes();
++      return(_atomtype[n].c_str());
++    }
++
++    // the index of the atom type of a given atom
++    int AtomTypeAsNumber(int atom) {
++      OBAtom *a;
++      string atype;
++      vector<string>::iterator i;
++      int ret = 0;
++      
++      a = _mol.GetAtom(atom+1); // atom is supposed to start from zero
++      if(a) atype = a->GetType();
++      else { 
++	cout << "WARNING in AtomTypeAsNumber" << endl; 
++	cout << "Cannot find type of atom " << atom << endl;
++	return -1; 
++      }
++
++      for(i = _atomtype.begin() ; i != _atomtype.end() ; ++i, ++ret)
++	if(atype == (*i)) return ret;
++      
++      return ret;
++    }
++
++    // NON-BONDED TERMS
++    double LJEps(const char* name) 
++    {
++      OBFFParameter *parameter = GetParameterUFF(name, _ffparams);
++      return(parameter->_dpar[3] * KCAL_TO_KJ);
++    }
++
++    double LJSig(const char* name) 
++    {
++      OBFFParameter *parameter = GetParameterUFF(name, _ffparams);
++      return(parameter->_dpar[2] * pow(2.0,-1.0/6.0));
++    }
++
++    // BONDS
++    int NBonds() { return _bondcalculations.size(); }
++    int NBondParams() { return 3; } // bond-order; kb; r0
++    double BondParam(int bond, int parnum) {
++      double ret = 0.0;
++      OBFFBondCalculationUFF b = _bondcalculations[bond];
++      switch(parnum) {
++      case 0:
++	ret = b.bt;
++	break;
++      case 1:
++	ret = b.kb;
++	break;
++      case 2:
++	ret = b.r0;
++	break;
++      }
++      return ret;
++    }
++    int BondAtomIdx(int bond, int which) {
++      int ret = -1;
++      OBFFBondCalculationUFF b = _bondcalculations[bond];
++      switch(which) {
++      case 0:
++	ret = b.a->GetIdx();
++	break;
++      case 1:
++	ret = b.b->GetIdx();
++	break;
++      }
++      return ret; 
++    }
++
++
++    // ANGLES
++    int NAngles() { return _anglecalculations.size(); }
++    int NAngleParams() { return 5; } // coord, ka, c0, c1, c2
++    double AngleParam(int angle, int parnum) {
++      double ret = 0.0;
++      OBFFAngleCalculationUFF a = _anglecalculations[angle];
++      switch(parnum) {
++      case 0:
++        ret = a.coord;
++        break;
++      case 1:
++        ret = a.ka;
++        break;
++      case 2:
++        ret = a.c0;
++        break;
++      case 3:
++        ret = a.c1;
++        break;
++      case 4:
++        ret = a.c2;
++        break;
++      }
++      return ret;
++    }
++    int AngleAtomIdx(int angle, int which) {
++      int ret = -1;
++      OBFFAngleCalculationUFF a = _anglecalculations[angle];
++      switch(which) {
++      case 0:
++	ret = a.a->GetIdx();
++	break;
++      case 1:
++	ret = a.b->GetIdx();
++	break;
++      case 2:
++	ret = a.c->GetIdx();
++	break;
++      }
++      return ret; 
++    }
++
++    // TORSIONS
++    int NTorsions() { return _torsioncalculations.size(); }
++    int NTorsionParams() { return 3; } // V, Phi0, n
++    double TorsionParam(int tors, int parnum) {
++      double ret = 0.0;
++      OBFFTorsionCalculationUFF t = _torsioncalculations[tors];
++      switch(parnum) {
++      case 0:
++        ret = t.V;
++        break;
++      case 1:
++        ret = t.Phi0;
++        break;
++      case 2:
++        ret = t.n;
++        break;
++      }
++      return ret;
++    }
++    
++    int TorsionAtomIdx(int tors, int which) {
++      int ret = -1;
++      OBFFTorsionCalculationUFF t = _torsioncalculations[tors];
++      switch(which) {
++      case 0:
++	ret = t.a->GetIdx();
++	break;
++      case 1:
++	ret = t.b->GetIdx();
++	break;
++      case 2:
++	ret = t.c->GetIdx();
++	break;
++      case 3:
++	ret = t.d->GetIdx();
++	break;
++      }
++      return ret; 
++    }
++
++    // INVERSIONS
++    int NInversions() { return _oopcalculations.size(); }
++    int NInversionParams() { return 4; } // 
++    double InversionParam(int inv, int parnum) {
++      double ret = 0.0;
++      OBFFOOPCalculationUFF t = _oopcalculations[inv];
++      switch(parnum) {
++      case 0:
++	ret = t.koop;
++	break;
++      case 1:
++	ret = t.c0;
++	break;
++      case 2:
++	ret = t.c1;
++	break;
++      case 3:
++	ret = t.c2;
++	break;
++      }
++      return ret;
++    }
++
++    int InversionAtomIdx(int inv, int which) {
++      int ret = -1;
++      OBFFOOPCalculationUFF t = _oopcalculations[inv];
++      switch(which) {
++      case 0:
++	ret = t.a->GetIdx();
++	break;
++      case 1:
++	ret = t.b->GetIdx();
++	break;
++      case 2:
++	ret = t.c->GetIdx();
++	break;
++      case 3:
++	ret = t.d->GetIdx();
++	break;
++      }
++      return ret; 
++    }
++
++    // end of the part added by GG.
++    
+   }; // class OBForceFieldUFF
+ 
+ }// namespace OpenBabel
+diff -urN openbabel-2.3.2/src/formats/chemkinformat.cpp openbabel-2.3.2-gg/src/formats/chemkinformat.cpp
+--- openbabel-2.3.2/src/formats/chemkinformat.cpp	2012-10-03 21:08:14.000000000 +0200
++++ openbabel-2.3.2-gg/src/formats/chemkinformat.cpp	2025-10-24 12:13:34.528445928 +0200
+@@ -639,7 +639,8 @@
+       }
+     }
+   }
+-  return ifs!=NULL;
++  //return ifs!=NULL;
++  return static_cast<bool>(ifs);
+ }
+ 
+ ///////////////////////////////////////////////////////////////
+diff -urN openbabel-2.3.2/src/formats/chemkinformat.cpp~ openbabel-2.3.2-gg/src/formats/chemkinformat.cpp~
+--- openbabel-2.3.2/src/formats/chemkinformat.cpp~	1970-01-01 01:00:00.000000000 +0100
++++ openbabel-2.3.2-gg/src/formats/chemkinformat.cpp~	2025-10-24 12:13:34.528445928 +0200
+@@ -0,0 +1,1077 @@
++  /**********************************************************************
++Copyright (C) 2005-2007 by Chris Morley
++
++This file is part of the Open Babel project.
++For more information, see <http://openbabel.org/>
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation version 2 of the License.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++***********************************************************************/
++#include "openbabel/babelconfig.h"
++
++#include <string>
++#include <iomanip>
++#include <map>
++#include <set>
++#include <iterator>
++#include <locale>
++
++#include "openbabel/mol.h"
++#include "openbabel/oberror.h"
++#include "openbabel/obconversion.h"
++#include "openbabel/reaction.h"
++#include "openbabel/kinetics.h"
++#include "openbabel/obmolecformat.h"
++
++using namespace std;
++//using std::tr1::shared_ptr;
++
++namespace OpenBabel
++{
++
++class ChemKinFormat : public OBFormat
++{
++public:
++  ChemKinFormat()
++  {
++    OBConversion::RegisterFormat("ck",this);
++    OBConversion::RegisterOptionParam("s", this); //no params
++    OBConversion::RegisterOptionParam("t", this);
++    Init();
++  }
++
++  virtual const char* Description()
++  {
++      return
++"ChemKin format\n"
++"Read Options e.g. -aL\n"
++" f <file> File with standard thermo data: default therm.dat\n"
++" z Use standard thermo only\n"
++" L Reactions have labels (Usually optional)\n"
++"\n"
++"Write Options e.g. -xs\n"
++" s Simple output: reactions only\n"
++" t Do not include species thermo data\n"
++" 0 Omit reactions with zero rates\n"
++"\n";
++  };
++
++  virtual const char* TargetClassDescription()
++  {
++      return OBReaction::ClassDescription();
++  };
++
++  const type_info& GetType()
++  {
++    return typeid(OBReaction*);
++  };
++private:
++  void              Init();
++  ///\return -1 eof or error; +1 reactionline found; 0 otherwise
++  int               ReadLine(istream& ifs);
++  bool              ReadHeader(istream& ifs, OBConversion* pConv);
++  bool              ParseReactionLine(OBReaction* pReact, OBConversion* pConv);
++  bool              ReadReactionQualifierLines(istream& ifs, OBReaction* pReact);
++  shared_ptr<OBMol> CheckSpecies(string& name, string& ln, bool MustBeKnown);
++  bool              ReadThermo(OBConversion* pConv);
++  bool              ReadStdThermo(const string& datafilename);
++  OBFormat*         GetThermoFormat();
++  bool              CheckAllMolsHaveThermo();
++  bool              WriteReactionLine(OBReaction* pReact, OBConversion* pConv);
++  bool              WriteHeader(OBConversion* pConv);
++private:
++  typedef map<string,shared_ptr<OBMol> > MolMap;
++  typedef set<shared_ptr<OBMol> > MolSet;
++  //used on input
++  MolMap IMols;
++  string ln;
++  bool SpeciesListed;
++  double AUnitsFactor, EUnitsFactor;
++  string comment;
++  //used on output
++  MolSet OMols;
++  stringstream ss;
++
++  ////////////////////////////////////////////////////
++  /// The "API" interface functions
++  virtual bool ReadMolecule(OBBase* pOb, OBConversion* pConv);
++  virtual bool WriteMolecule(OBBase* pOb, OBConversion* pConv);
++
++  ////////////////////////////////////////////////////
++  /// The "Convert" interface functions
++  virtual bool ReadChemObject(OBConversion* pConv)
++  {
++    std::string auditMsg = "OpenBabel::Read ChemKinFormat";
++    std::string description(Description());
++    auditMsg += description.substr(0,description.find('\n'));
++    obErrorLog.ThrowError(__FUNCTION__,
++              auditMsg,
++              obAuditMsg);
++    //Makes a new OBReaction
++    OBReaction* pReact = new OBReaction;
++    bool ret=ReadMolecule(pReact,pConv); //call the "API" read function
++
++    if(ret) //Do transformation and return molecule
++      return pConv->AddChemObject(pReact->DoTransformations(pConv->GetOptions(OBConversion::GENOPTIONS),pConv))!=0;
++    else
++        pConv->AddChemObject(NULL);
++    return false;
++  }
++
++  virtual bool WriteChemObject(OBConversion* pConv)
++  {
++    OBBase* pOb=pConv->GetChemObject();
++    OBReaction* pReact = dynamic_cast<OBReaction*>(pOb);
++    bool ret=false;
++    if(pReact!=NULL)
++    {
++      ret=WriteMolecule(pReact,pConv);
++
++      std::string auditMsg = "OpenBabel::Write reaction ";
++      std::string description(Description());
++            auditMsg += description.substr( 0, description.find('\n') );
++            obErrorLog.ThrowError(__FUNCTION__,
++                                  auditMsg,
++                                  obAuditMsg);
++    }
++    delete pOb;
++    return ret;
++  }
++};
++
++//Make an instance of the format class
++ChemKinFormat theChemKinFormat;
++
++/////////////////////////////////////////////////////////////////
++bool ChemKinFormat::ReadMolecule(OBBase* pOb, OBConversion* pConv)
++{
++  /*Badly name function. It handles OBReaction objects.
++
++  This format can be used with Chemkin files or with simple lists of
++  reactions.
++
++  In the simple case:
++  Reversible reactions use = or <=> Irreversible reactions use =>
++      A + B = C
++      D     => E + F
++  Rate parameters A, n and E can follow, separated by spaces.
++      A+B=C 1.2E12 1.0 5000
++  The species can have names containing spaces
++      first reactant + second reactant => first product + second product
++  The reactions can optionally have a label
++      label first reactant => first product
++  In ambiguous cases like
++      label A + B = C
++  the program assumes that "label A" is the first reactant. To force the
++  correct interetation, use the -al option "Reactions have labels".
++  Even in the simple case, each reaction can be followed by lines with
++  additional information in the CheKin style, like low pressure rates,
++  third body efficiencies, etc.
++
++  On the first call, the function reads any header sections, ELEMENTS,
++  SPECIES,  THERMO that are present and populates the IMols list of
++  molecules. It then reads the first reaction and returns true.
++  Subsequent calls also read a single reaction. A return of false
++  indicates there are no more reactions.
++  */
++  OBReaction* pReact = dynamic_cast<OBReaction*>(pOb);
++  if(!pReact)
++    return false;
++
++  istream& ifs = *pConv->GetInStream();
++
++  if(pConv->IsFirstInput())
++  {
++    Init();
++    if(!ReadHeader(ifs, pConv))
++    {
++      obErrorLog.ThrowError(__FUNCTION__, "Unexpected end of file or file reading error", obError);
++      return false;
++    }
++  }
++
++  if(!ifs                                      //possibly EOF
++   || !ReadLine(ifs)                           //not a reaction line
++   || !ParseReactionLine(pReact, pConv)        //faulty parse
++   || !ReadReactionQualifierLines(ifs, pReact))//END or erroneous line found
++   return false;
++
++  //return true if reaction has either reactants or products
++  return pReact->NumReactants() + pReact->NumProducts()>0;
++}
++
++/////////////////////////////////////////////////
++void ChemKinFormat::Init()
++{    //initialize the member variables used during input
++    ln.clear();
++    AUnitsFactor = 1.0;
++    EUnitsFactor = 1.0;
++    SpeciesListed=false;
++    IMols.clear();
++    //Special species name
++    shared_ptr<OBMol> sp(new OBMol);
++    sp.get()->SetTitle("M");
++    IMols["M"] = sp;
++}
++
++/////////////////////////////////////////////////
++// Uses the line from the member variable ln, probably from previous call to
++// ReadMolecule, if it is not empty. Otherwise read a line and extract the comment.
++// Returns -1 on eof or error; +1 if line is a reaction; 0 otherwise.
++int ChemKinFormat::ReadLine(istream& ifs )
++{
++  while(ln.empty())
++  {
++    if(!getline(ifs,ln))
++      return -1;
++    //discard lines that are empty or contain just a comment
++    if(Trim(ln).empty() || ln[0]=='!')
++      ln.clear();
++    comment.clear();
++  }
++  string::size_type eqpos, commentpos;
++  commentpos = ln.find('!');
++  //Extract and remove comment
++  if(commentpos!=string::npos)
++  {
++    comment = ln.substr(commentpos+1);
++    ln.erase(commentpos);
++  }
++
++  eqpos = ln.find('=');
++  //eof may have been set, but we need ReadMolecule() to be called again to process this line
++  ifs.clear();
++  return eqpos==string::npos? 0 : +1;
++}
++
++//////////////////////////////////////////////////////
++bool ChemKinFormat::ReadHeader(istream& ifs, OBConversion* pConv)
++{
++  bool doingspecies=false;
++  //loop for each line until a reaction line is found
++  while(ifs)
++  {
++    if(int ret=ReadLine(ifs)!=0)
++      return ret>0; //reaction line found: there may have been no header
++
++    vector<string> toks;
++    tokenize(toks, ln, " \t\n\r/\\");
++    ln.clear(); //have to clear line when it has been dealt with
++
++    if(doingspecies || !strcasecmp(toks[0].c_str(),"SPECIES") || !strcasecmp(toks[0].c_str(),"SPEC"))
++    {
++      SpeciesListed = true; //Means that molecules in reactions must have been specified in SPECIES
++
++      vector<string>::iterator itr;
++      itr=toks.begin();
++      if(!doingspecies) ++itr; //ignore "SPECIES"
++      doingspecies=true;
++      for(;itr!=toks.end();++itr)
++      {
++        if(*itr=="END" || *itr=="end")
++        {
++          doingspecies=false;
++          break;
++        }
++        //Add all species to IMols
++        shared_ptr<OBMol> sp(new OBMol);
++        sp.get()->SetTitle(*itr);
++        IMols[*itr] = sp;
++      }
++    }
++
++    else if(!strcasecmp(toks[0].c_str(),"THERMO"))
++    {
++      //Read following data using Thermo format
++      if(!pConv->IsOption("z",OBConversion::INOPTIONS))
++      {
++        pConv->AddOption("e", OBConversion::INOPTIONS); //stops on END
++        ReadThermo(pConv);
++        pConv->RemoveOption("e", OBConversion::INOPTIONS);
++      }
++    }
++
++    else if(!strcasecmp(toks[0].c_str(),"REACTIONS") || !strcasecmp(toks[0].c_str(),"REAC"))
++    {
++      //Units may be specified on this line
++      string EKeywords[6] ={"CAL/MOLE","KCAL/MOLE","JOULES/MOLE","KJOULES/MOLE","KELVINS","EVOLTS"};
++      double EFactor[6]   ={   1.0    ,   0.001  ,    4.1816    ,   0.041816   ,   1.98  , 0.0};
++      double AvFactor = 6.023E23;
++
++      for (unsigned int i=1; i<toks.size(); ++i)
++      {
++        for(int j=0;j<6;++j)
++          if(!strcasecmp(toks[i].c_str(), EKeywords[j].c_str()))
++            EUnitsFactor = EFactor[j];
++        if(!strcasecmp(toks[i].c_str(),"MOLECULES"))
++          AUnitsFactor = AvFactor;
++      }
++
++      //Need to check here whether thermo data has been input and if not
++      //load it from therm.dat
++      if(!CheckAllMolsHaveThermo())
++      {
++        string stdthermo("therm.dat"); //default
++        const char* pstd = pConv->IsOption("f",OBConversion::INOPTIONS);
++        if(pstd)
++          stdthermo=pstd;
++        if(!ReadStdThermo(stdthermo))
++          return false;
++      }
++
++    }
++
++  // Anthing not in a SPECIES or THERMO section is ignored.
++  // This includes the ELEMENTS section
++  }
++  return false; //failed file read
++}
++
++//////////////////////////////////////////////
++bool ChemKinFormat::ParseReactionLine(OBReaction* pReact, OBConversion* pConv)
++{
++  /* Line is a reaction
++  Lines like the following are handled
++  Label A + B => C + D 1E-12 0.2 2300 !comment
++  H2 = 2H 1e-8 0 112000 comment: has A n E
++  2H + M => H2 + M 1e-16 comment: has A only
++  Label A+B = C+D comment: has no rates
++  */
++  OBRateData* pRD = new OBRateData; //to store rate constant data. Attach only if rate data found
++
++  int n=0;
++  shared_ptr<OBMol> sp;
++
++  string::size_type eqpos = ln.find('=');
++
++  bool r1=false, r2=false;
++  //Ensure divider between reactants and products is just '='
++  if(eqpos>0 && ln[eqpos-1]=='<')
++  {
++    ln[eqpos-1] = ' ';
++    r1=true;
++  }
++  if(eqpos < ln.size()-1 && ln[eqpos+1]=='>')
++  {
++    ln[eqpos+1] = ' ';
++    r2=true;
++  }
++  if(r1 || !r2)
++  {
++    //Reaction is reversible: contains <=> or =
++    pReact->SetReversible();
++  }
++
++  //Replace each (+M) by M
++  string::size_type pos;
++  while((pos = ln.find("(+M)")) != string::npos)
++    ln.replace(pos, 4, " +M ");
++  while((pos = ln.find("(+m)")) != string::npos)
++    ln.replace(pos, 4, " +M ");
++
++  //Do reactants
++  vector<string> toks;
++  vector<string>::iterator itr;
++  string temp = ln.substr(0, eqpos);
++  tokenize(toks, temp, "+");
++  //(ln is cleared later)
++
++  for(itr=toks.begin();itr!=toks.end();++itr)
++  {
++    Trim(*itr);
++    if(itr==toks.begin())
++    {
++      /*First token can contain a label, and reactant can contain spaces
++        label reactant1      +  1
++        first reactant       +  case 2
++        label first reactant +  case 3
++        reactant1            +  case 4
++        label                =  case 5
++        reactant1            =  case 6
++        (1 and 2) and (5 and 6) are ambiguous if -al option not set. Assume 2 or 6 and issue a warning
++      */
++      vector<string> firstr;
++      tokenize(firstr, *itr, " \t");
++      if(isalpha(firstr[0][0]))
++      {
++        //Starts with letter, so could be a label. Further tests...
++        if(pConv->IsOption("L",OBConversion::INOPTIONS)//this option mandates a label
++          || firstr.size()>2                           //case 3 above
++          || (SpeciesListed && !IMols.count(*itr)))    // there is a species list and it is not a species name
++        {
++          pReact->SetTitle(firstr[0]);             //Add label to OBReaction
++          Trim(toks[0].erase(0, firstr[0].size()));//Remove label leaving only first reactant
++        }
++
++        //Ambiguous cases
++        else if(firstr.size()==2 || (firstr.size()==1 && toks.size()==1))
++          obErrorLog.ThrowError(__FUNCTION__,
++            "In " + ln +
++            "\nThe string " + firstr[0] + " has been assumed NOT to be a label\n"
++            "If it should be, use the -aL option which mandates labels on reactions.\n"
++            "A species missing from the SPECIES section, if one is used, can also give this error",
++            obWarning);
++      }
++    }
++
++    if(isalpha((*itr)[0]))
++    {
++      if(*itr == "m")
++        *itr="M";
++      if(*itr == "M")
++        pRD->ReactionType = OBRateData::THREEBODY;
++      sp = CheckSpecies(*itr, ln, SpeciesListed);
++      if(!sp.get())
++      {
++        ln.clear();
++        return false;
++      }
++      pReact->AddReactant(sp);
++      continue;
++    }
++    else
++    {
++      if(isalpha((*itr)[1]))
++      {
++        //species multiplier (single digit)
++        unsigned mult = atoi(itr->c_str());
++        string temp = itr->substr(1);
++        sp = CheckSpecies(temp, ln, SpeciesListed);
++        if(!sp.get())
++        {
++          ln.clear();
++          return false;
++        }
++        for (unsigned int i=0; i<mult; ++i)
++          pReact->AddReactant(sp);
++        continue;
++      }
++      else
++      {
++        obErrorLog.ThrowError(__FUNCTION__,
++          "In " + ln  +
++          "\nThe species multiplier must be a single digit integer",
++          obError);
++        ln.clear();
++        return false; //incorrect multiplier
++      }
++    }
++  }
++
++  //Do products
++  temp = ln.substr(eqpos+1);
++  tokenize(toks, temp, "+");
++  if(toks.size()>0)
++  {
++    /*
++      product1
++      2product1
++      first product
++      last product   7.7 8.8
++      product   7.7 8.8
++      product   7.7 8.8E
++      12 0
++    */
++    //Combine tokens erroneously split at + in 8.8E+12
++    for(int i = toks.size()-1;i>0 && isdigit(toks[i][0]);--i)//break when starts with letter
++    {
++      char lastch = toks[i-1][toks[i-1].size()-1];
++      if(lastch=='E' || lastch=='e')
++      {
++        toks[i-1] += toks[i];
++        toks.pop_back();
++      }
++    }
++
++    //Split the last token and separate the rate parameters
++    vector<string> lastp;
++    tokenize(lastp, toks[toks.size()-1], " \t");
++    toks[toks.size()-1].clear();
++    bool HasRateData=false;
++    n=0;
++    for(itr=lastp.begin();itr!=lastp.end();++itr)
++    {
++      Trim(*itr);
++      //copy species names and species names with multiplier (single digit) back into orig token
++      unsigned len = itr->size();
++
++      //Separate products like 2C2H6 2O 2ETR 2H2 from rate params like 2E25 2E+12 -1 .00
++      if(isalpha((*itr)[0]) ||            //to be a product: 1st char is a letter or...
++        (len>=2 && isalpha((*itr)[1])     //both second char (it there is one) is a letter and
++        && (len<=2 || isalpha((*itr)[2])  //  third char(if there is one) is a letter
++        || toupper((*itr)[1])!='E')))     //  or the second char is not 'E'
++      {
++        toks[toks.size()-1] += ' ' + *itr;
++        continue;
++      }
++
++      //Read in rate parameters
++      stringstream ss(*itr);
++      locale cLocale("C");
++      ss.imbue(cLocale);
++
++      double val;
++      ss >> val;
++      if(n==0)
++        val /= pow(AUnitsFactor,pReact->NumReactants());
++      else if(n==2)
++        val /= EUnitsFactor;
++      pRD->SetRate((OBRateData::rate_type)n++, val);
++      if(!ss)
++      {
++        //not numeric: put into comment (better than doing nothing)
++        pReact->SetComment(*itr);
++        break;
++      }
++      HasRateData=true;
++    }
++    //Rate parameters were specified, so OBReaction needs to have the OBRateData attached
++    if(HasRateData)
++      pReact->SetData(pRD);
++    else if(SpeciesListed) //a true ChemKin file
++      obErrorLog.ThrowError(__FUNCTION__,
++            "In " + ln + "\nNo rate data found.", obWarning);
++
++    //Read in product species
++    for(itr=toks.begin();itr!=toks.end();++itr)
++    {
++      Trim(*itr);
++      if(isalpha((*itr)[0]))
++      {
++        if(*itr == "m")
++          *itr="M";
++
++        sp = CheckSpecies(*itr, ln, SpeciesListed);
++        if(!sp.get())
++        {
++          ln.clear();
++          return false;
++        }
++        pReact->AddProduct(sp);
++      }
++      else
++      {
++        if(itr->size()>1 && isalpha((*itr)[1]))
++        {
++          //species multiplier (single digit)
++          unsigned mult = atoi(itr->c_str());
++          string temp = itr->substr(1);
++          sp = CheckSpecies(temp, ln, SpeciesListed);
++          if(!sp.get())
++          {
++            ln.clear();
++            return false;
++          }
++          for (unsigned int j=0; j<mult; ++j)
++            pReact->AddProduct(sp);
++        }
++        else
++          obErrorLog.ThrowError(__FUNCTION__,
++            "In " + ln + "\nError in products or rate parameters.", obError);
++      }
++    }
++  }
++  pReact->SetComment(comment);
++  ln.clear();
++  return true;
++}
++
++/////////////////////////////////////////////
++bool ChemKinFormat::ReadReactionQualifierLines(istream& ifs, OBReaction* pReact)
++{
++  OBRateData* pRD = (OBRateData*)pReact->GetData("Rate data");
++
++  while(ifs)
++  {
++    if(int ret=ReadLine(ifs)!=0)
++      return ret>0; //The next reaction has been found
++
++    vector<string> toks;
++    tokenize(toks, ln, " \t\n\r/\\");
++    ln.clear(); //have to clear line when it has been dealt with
++
++    if(pRD && !strcasecmp(toks[0].c_str(),"LOW"))
++    {
++      if(pRD->ReactionType != OBRateData::TROE)
++        pRD->ReactionType = OBRateData::LINDERMANN;
++      unsigned n;
++      for(n=0;n<3;++n)
++      {
++        double val = atof(toks[n+1].c_str());
++        if(n==0)
++          val /= pow(AUnitsFactor, pReact->NumReactants());
++        else if(n==2)
++          val /= EUnitsFactor;
++        pRD->SetLoRate((OBRateData::rate_type)n, val );
++      }
++    }
++    else if(pRD && !strcasecmp(toks[0].c_str(),"TROE"))
++    {
++      pRD->ReactionType = OBRateData::TROE;
++      for(int i=0;i<4;++i)
++        pRD->SetTroeParams(i, atof(toks[i+1].c_str()));
++    }
++
++    else if(!strcasecmp(toks[0].c_str(),"DUPLICATE"))
++    {}
++
++    else if(pReact && !strcasecmp(toks[0].c_str(),"TS"))
++    {
++      //Defines the molecule which is a transition state for a reaction
++      //This is not a ChemKin keyword. Used for Mesmer.
++      pReact->SetTransitionState(CheckSpecies(toks[1], ln, SpeciesListed));
++    }
++
++    else if(pRD && strcasecmp(toks[0].c_str(),"END") && toks.size()%2==0)
++    {
++      //not "END". Has an even number of tokens.
++      //3-body efficiencies
++      for(int i=0;i<toks.size()-1;++i)//also incremented in body to retrieve id,val pairs
++      {
++        string sp(toks[i++]);
++        pRD->SetEfficiency(sp, atof(toks[i].c_str()));
++      }
++    }
++  }
++  return ifs!=NULL;
++}
++
++///////////////////////////////////////////////////////////////
++shared_ptr<OBMol> ChemKinFormat::CheckSpecies(string& name, string& ln, bool MustBeKnown)
++{
++  MolMap::iterator mapitr = IMols.find(name);
++  if(mapitr==IMols.end())
++  {
++    //unknown species
++    if(MustBeKnown)
++    {
++      obErrorLog.ThrowError(__FUNCTION__,
++        name + " not recognized as a species in\n" + ln, obError);
++      shared_ptr<OBMol> sp;
++      return sp; //empty
++    }
++    else
++    {
++      // There was no REACTIONS section in input file and probably no SPECIES section.
++      // Unknown species that appear in a reaction can be made here with just a name.
++      shared_ptr<OBMol> sp(new OBMol);
++      sp->SetTitle(name.c_str());
++      return sp;
++    }
++  }
++  else
++    return mapitr->second;
++}
++
++
++//////////////////////////////////////////////////////////////////
++bool ChemKinFormat::ReadThermo(OBConversion* pConv)
++{
++  /*	Reads molecule using thermoformat.
++      Finds mol in IMols with same name
++       and combines the one with OBNasaThermoData with it.
++      Continue with all molecules.
++      Construct index if pIndex!=NULL.
++  */
++  OBFormat* pThermFormat = OBConversion::FindFormat("therm");
++  if(!pThermFormat)
++  {
++    obErrorLog.ThrowError(__FUNCTION__,
++    "Thermo format needed but not available", obError);
++    return false;
++  }
++  else
++  {
++    pConv->SetInFormat(pThermFormat);
++    pConv->AddOption("e", OBConversion::INOPTIONS); //stops on END
++
++    OBMol thmol;
++    while(pConv->Read(&thmol))
++    {
++      MolMap::iterator mapitr = IMols.find(thmol.GetTitle());
++      if(mapitr!=IMols.end())
++      {
++        shared_ptr<OBMol> psnewmol(OBMoleculeFormat::MakeCombinedMolecule(mapitr->second.get(),&thmol));
++        IMols.erase(mapitr);
++        IMols[thmol.GetTitle()] = psnewmol;
++      }
++      thmol.Clear();
++    }
++    pConv->SetInFormat(this);
++  }
++  pConv->RemoveOption("e", OBConversion::INOPTIONS);
++  return true;
++}
++
++/////////////////////////////////////////////////////////////////
++bool ChemKinFormat::ReadStdThermo(const string& datafilename)
++{
++  OBMoleculeFormat::NameIndexType index;
++  OBFormat* pThermFormat = GetThermoFormat();
++
++  //Get the index of std thermo file, which may involve it being prepared
++  if(!pThermFormat || !OBMoleculeFormat::ReadNameIndex(index, datafilename, pThermFormat))
++    return false;
++
++  string missing; // list of molecules which do not have thermodata
++  OBConversion StdThermConv;
++  ifstream stdthermo;
++  OpenDatafile(stdthermo, datafilename);
++  if(!stdthermo)
++  {
++    obErrorLog.ThrowError(__FUNCTION__,
++    datafilename + " was not found", obError);
++    return false;
++  }
++  StdThermConv.SetInFormat(pThermFormat);
++  StdThermConv.SetInStream(&stdthermo);
++
++  MolMap::iterator mapitr;
++  for(mapitr=IMols.begin();mapitr!=IMols.end();++mapitr)
++  {
++    //Look up each molecules's name in index, move the the returned seek position,
++    //read the molecule and combine it with the one in Imols
++    OBMoleculeFormat::NameIndexType::iterator itr = index.find(mapitr->first);
++    if(itr!=index.end())
++    {
++      OBMol thmol;
++      stdthermo.seekg(itr->second);
++      StdThermConv.Read(&thmol);
++      shared_ptr<OBMol> psnewmol(OBMoleculeFormat::MakeCombinedMolecule(mapitr->second.get(),&thmol));
++      IMols[thmol.GetTitle()] = psnewmol;
++    }
++    else
++      if(mapitr->first!="M")
++        missing += mapitr->first + ',';
++  }
++  if(!missing.empty())
++  {
++    obErrorLog.ThrowError(__FUNCTION__,
++    datafilename + " does not contain thermodata for " + missing, obError);
++    return false;
++  }
++  return true;
++}
++
++//////////////////////////////////////////////////////////
++bool ChemKinFormat::CheckAllMolsHaveThermo()
++{
++  MolMap::iterator mapitr;
++  for(mapitr=IMols.begin();mapitr!=IMols.end();++mapitr)
++  {
++    if(!mapitr->second->GetData(ThermoData) && mapitr->first!="M")
++      return false;
++  }
++  return true;
++}
++
++/////////////////////////////////////////////////////////////////
++bool ChemKinFormat::WriteMolecule(OBBase* pOb, OBConversion* pConv)
++{
++  //It's really a reaction, not a molecule. Called separately for each reaction.
++  //Cast output object to the class type need, i.e. OBReaction
++  OBReaction* pReact = dynamic_cast<OBReaction*>(pOb);
++  if(pReact==NULL)
++      return false;
++
++  //Read in reaction, store mols in OMols, write reaction to stringstream ss.
++  if(pConv->GetOutputIndex()==1)
++  {
++    OMols.clear();
++    ss.str("");
++  }
++
++  WriteReactionLine(pReact, pConv);
++
++  //At end, construct ELEMENTS and SPECIES and output to ofs followed by ss
++  if(pConv->IsLast())
++  {
++    ostream& ofs = *pConv->GetOutStream();
++    if(!pConv->IsOption("s")) //Simple output option - reactions only
++    {
++      if(!WriteHeader(pConv))
++        return false;
++      ofs << "REACTIONS\n";
++    }
++    ofs  << ss.rdbuf() << endl;
++    if(!pConv->IsOption("s"))
++      ofs << "END" << endl;
++  }
++  return true;
++}
++
++//////////////////////////////////////////////////////////////////
++bool ChemKinFormat::WriteHeader(OBConversion* pConv)
++{
++  ostream& ofs = *pConv->GetOutStream();
++
++  set<string> elements;
++  vector<string> species;
++  MolSet::iterator itr;
++  for(itr= OMols.begin();itr!=OMols.end();++itr)
++  {
++    const char* title = (*itr)->GetTitle();
++    if(strcmp(title, "M"))
++      species.push_back(title);
++    FOR_ATOMS_OF_MOL(atom, itr->get())
++      elements.insert(etab.GetSymbol(atom->GetAtomicNum()));
++  }
++  if(!elements.empty())
++  {
++    ofs << "ELEMENTS\n";
++    copy(elements.begin(),elements.end(), ostream_iterator<string>(ofs," "));
++    ofs << "\nEND\n";
++  }
++  else
++    obErrorLog.ThrowError(__FUNCTION__, "No element data available", obWarning);
++
++  ofs << "SPECIES\n";
++  vector<string>::iterator sitr;
++  unsigned int maxlen=0;
++  for(sitr= species.begin();sitr!=species.end();++sitr)
++    if(sitr->size()>maxlen) maxlen = sitr->size();
++
++  unsigned int n=0;
++  for(sitr=species.begin();sitr!=species.end();++sitr, ++n)
++  {
++    if(maxlen>0 && n > 80 / maxlen)
++    {
++      ofs << '\n';
++      n=0;
++    }
++    ofs << setw(maxlen+1) << *sitr;
++  }
++  ofs << "\nEND\n";
++
++  if(!pConv->IsOption("t"))
++  {
++    OBFormat* pFormat = OBConversion::FindFormat("therm");
++    if(!pFormat)
++    {
++      obErrorLog.ThrowError(__FUNCTION__,
++      "Thermo format needed but not available", obError);
++      return false;
++    }
++    else
++    {
++      stringstream thermss;
++      thermss << "THERMO ALL\n";
++      thermss << "   300.000  1000.000  5000.000\n";
++      OBConversion ConvThermo(*pConv);
++      ConvThermo.SetOutFormat(pFormat);
++      ConvThermo.SetOutStream(&thermss);
++      int ntherm=0;
++      for(itr= OMols.begin();itr!=OMols.end();++itr)
++      {
++        const char* title = (*itr)->GetTitle();
++        if(strcmp(title, "M"))
++          if(ConvThermo.Write(itr->get()))
++            ++ntherm;
++      }
++
++      thermss << "END\n";
++      if(ntherm)
++        ofs << thermss.str(); //but don't output unless there was some thermo data
++    }
++  }
++  return true;
++}
++
++//////////////////////////////////////////////////////////////////
++bool ChemKinFormat::WriteReactionLine(OBReaction* pReact, OBConversion* pConv)
++{
++  //Get rate data so that we know what kind of reaction it is
++  OBRateData* pRD = static_cast<OBRateData*>(pReact->GetData(RateData));
++
++  //If -0 option set, omit reactions with zero rates. However, number of reactions converted remains the same.
++  if(pConv->IsOption("0"))
++    if(!pRD || pRD->GetRate(OBRateData::A)==0.0)
++      return false;
++
++  ss << pReact->GetTitle() << '\t';
++
++  if(!pRD && !pConv->IsOption("s"))
++    obErrorLog.ThrowError(__FUNCTION__, "Reaction " + pReact->GetTitle()
++     + " has no rate data", obWarning);
++
++  string mstring;
++  if(pRD)
++  {
++    switch(pRD->ReactionType)
++    {
++    case OBRateData::TROE:
++    case OBRateData::SRI:
++    case OBRateData::LINDERMANN:
++      mstring = " (+M) ";
++    }
++  }
++
++  int i;
++  for(i=0;i<pReact->NumReactants();++i)
++  {
++    shared_ptr<OBMol> psMol = pReact->GetReactant(i);
++//    if(strcasecmp(psMol->GetTitle(),"M"))
++    OMols.insert(psMol);
++
++    //If reactant has no title use its formula
++    if(*psMol->GetTitle()=='\0')
++      psMol->SetTitle(psMol->GetSpacedFormula(1,"").c_str());
++
++    //write species name but, if M, only if (+M) is not going to be output
++    if(mstring.empty() || strcasecmp(psMol->GetTitle(),"M"))
++    {
++      if (i)
++        ss << " + ";
++      ss << setw(3) << left << psMol->GetTitle();
++    }
++  }
++
++  /*
++  3-body
++  H + H + M <=> H2 + M  May have efficiencies
++  Lindemann
++  O + CO (+M) <=> CO2 (+M) Has LOW/ and may have efficiencies. Troe[0]=0
++  Troe
++  H + CH3 (+M) <=> CH4 (+M) Has LOW/ and TROE/ and may have efficiencies
++  SRI
++  */
++
++  if(mstring.empty() && pReact->NumReactants()<3)
++    ss << "     ";
++
++  ss << mstring;
++
++  if(pReact->IsReversible())
++    ss << "\t <=> \t";
++  else
++    ss << "\t => \t";
++
++  for(i=0;i<pReact->NumProducts();++i)
++  {
++    shared_ptr<OBMol> psMol = pReact->GetProduct(i);
++    if(strcasecmp(psMol->GetTitle(),"M"))
++      OMols.insert(psMol);
++
++    //If product has no title use its formula
++    if(*psMol->GetTitle()=='\0')
++      psMol->SetTitle(psMol->GetSpacedFormula(1,"").c_str());
++
++    //write species name but, if M, only if (+M) is not going to be output
++    if(mstring.empty() || strcasecmp(psMol->GetTitle(),"M"))
++    {
++      if (i)
++        ss << " + ";
++      ss << setw(3) << left << psMol->GetTitle();
++    }
++  }
++  if(mstring.empty() && pReact->NumProducts()<3)
++    ss << "     ";
++
++  ss << mstring;
++
++  if(pRD)
++  {
++    ss << " \t" << scientific << setprecision(3) << pRD->GetRate(OBRateData::A) << ' '
++      << fixed << pRD->GetRate(OBRateData::n)	<< ' '
++      << setprecision(1) << pRD->GetRate(OBRateData::E)
++      << " \t" << pReact->GetComment() << endl;
++
++    switch(pRD->ReactionType)
++    {
++    case OBRateData::TROE:
++      ss << "\tTROE / " << setprecision(3) << pRD->GetTroeParam(0) << ' '
++        << pRD->GetTroeParam(1) << ' ' << pRD->GetTroeParam(2);
++      if(pRD->GetTroeParam(3))
++        ss << ' ' <<pRD->GetTroeParam(3);
++      ss << '/' << endl;
++      //fallthrough
++    case OBRateData::LINDERMANN:
++      ss << "\tLOW / " << scientific << setprecision(3) << pRD->GetLoRate(OBRateData::A) << ' '
++        << fixed << pRD->GetLoRate(OBRateData::n) << ' '
++        << setprecision(1) << pRD->GetLoRate(OBRateData::E) << '/' << endl;
++      //fallthrough
++    case OBRateData::THREEBODY:
++      string id;
++      double eff;
++      int neffs=0;
++      while(pRD->GetNextEff(id,eff))
++      {
++        if(!neffs) ss << '\t';
++        ss << id << "/ " << setprecision(2) << eff << "/ ";
++        ++neffs;
++      }
++      if(neffs)
++        ss << endl;
++    }
++  }
++  else //simple option
++    ss << pReact->GetComment() << endl;
++
++  return true;
++}
++
++OBFormat* ChemKinFormat::GetThermoFormat()
++{
++  OBFormat* pThermFormat = OBConversion::FindFormat("therm");
++  if(!pThermFormat)
++  {
++    obErrorLog.ThrowError(__FUNCTION__,
++    "Thermo format needed but not available", obError);
++    return NULL;
++  }
++  return pThermFormat;
++}
++} //namespace
++/*
++LINDEMANN FALLOFF FORM
++This treatment applies if no specific falloff parameters are given.
++At pressures intermediate to the high and low pressure limits,
++the rate constant is given by the Lindemann formula:
++
++                    k_inf
++         k = ----------------
++             1  +  k_inf/k_o[M]
++
++In cases where no high pressure limit rate constant parameters are given
++(i.e., the collider M as a reactant is not in parenthesis),
++the reaction is in the low pressure limit.
++
++TROE FALLOFF FORM
++A more refined treatment of pressure effects than Lindemann is employed
++using the TROE parameters. The falloff parameter F_cent for a unimolecular
++reaction is calculated from the values of a, b, c, and d by the formula of Troe
++
++      F_cent  =  (1-a) exp(-T/b)  +  a exp(-T/c)  +  exp(-d/T)
++
++which gives the temperature dependence of F_cent, the factor by which
++the rate constant of a given unimolecular reaction at temperature T and
++reduced pressure P_r = k_o[M]/k_inf of 1.0 is less than the value k_inf/2 which
++it would have if unimolecular reactions behaved according to the Lindemann formula.
++
++The broadening factor F, which is 1 for the Lindemann case where no parameters
++for F_cent are provided, is computed from F_cent by
++
++                                log F_cent
++      log F = ---------------------------------------------
++              1 + [(log P_r + C)/(N - 0.14{log P_r + C})]^2
++
++
++      with N = 0.75 - 1.27log F_cent  and  C = -0.4 - 0.67log F_cent.
++
++The rate coefficient, k, is then given by multiplying the Lindemann formula by F.
++a,b,c,d = a, T***, T*, T**
++
++See also http://gems.mines.edu/~reactionxml/Fall-off2.pdf
++*/
++/*
++@todo
++Make case independent
++Isotopes like D in ELEMENTS list
++ELEM and END is optional
++*/
+diff -urN openbabel-2.3.2/src/formats/textformat.cpp openbabel-2.3.2-gg/src/formats/textformat.cpp
+--- openbabel-2.3.2/src/formats/textformat.cpp	2011-03-24 01:18:59.000000000 +0100
++++ openbabel-2.3.2-gg/src/formats/textformat.cpp	2025-10-24 12:13:34.528445928 +0200
+@@ -79,7 +79,7 @@
+       ostream* ofs = pConv->GetOutStream();
+       if(ofs)
+         *ofs << pText->GetText();
+-      return *ofs;
++      return static_cast<bool>(*ofs);
+     }
+   }
+ };
+diff -urN openbabel-2.3.2/src/generic.cpp openbabel-2.3.2-gg/src/generic.cpp
+--- openbabel-2.3.2/src/generic.cpp	2012-10-03 21:08:15.000000000 +0200
++++ openbabel-2.3.2-gg/src/generic.cpp	2025-10-24 12:13:34.529445941 +0200
+@@ -29,6 +29,8 @@
+ #include <openbabel/atomclass.h>
+ #include <openbabel/alias.h>
+ 
++#include <math.h>
++
+ using namespace std;
+ 
+ namespace OpenBabel
+@@ -401,6 +403,24 @@
+     return vector3(x, y, z);
+   }
+ 
++  // Minimum Image Convention (GG)
++  vector3 OBUnitCell::MinimumImageFractional(vector3 frac)
++  {
++    double x = frac.x()-rint(frac.x());
++    double y = frac.y()-rint(frac.y());
++    double z = frac.z()-rint(frac.z());
++    return vector3(x, y, z);
++
++  }
++
++  vector3 OBUnitCell::MinimumImage(vector3 cart)
++  {
++    vector3 v = CartesianToFractional(cart);
++    v = MinimumImageFractional(v);
++    return FractionalToCartesian(v);
++  }
++
++
+   OBUnitCell::LatticeType OBUnitCell::GetLatticeType( int spacegroup )
+   {
+     //	1-2 	Triclinic
+diff -urN openbabel-2.3.2/src/molchrg.cpp openbabel-2.3.2-gg/src/molchrg.cpp
+--- openbabel-2.3.2/src/molchrg.cpp	2010-10-10 04:05:19.000000000 +0200
++++ openbabel-2.3.2-gg/src/molchrg.cpp	2025-10-24 12:13:34.529445941 +0200
+@@ -284,6 +284,151 @@
+         val[0] = 1.06;
+         val[1] = 5.47;
+         val[2] = 11.65;
++        // from http://mgltools.scripps.edu/api/PyBabel/PyBabel.gasteiger-pysrc.html
++	// GG
++        if(atom->GetHyb() == 3) {
++          val[0] = 1.29;
++          val[1] = 5.375;
++          val[2] = 11.195;
++        }
++        if(atom->GetHyb() == 2) {
++          val[0] = 1.47;
++          val[1] = 5.795;
++          val[2] = 11.51;
++        }
++        break;
++      case 5: //B
++        // from http://mgltools.scripps.edu/api/PyBabel/PyBabel.gasteiger-pysrc.html
++	// GG
++        if(atom->GetHyb() == 3) {
++          val[0] = 0.765;
++          val[1] = 5.98;
++          val[2] = 14.405;
++        }
++        if(atom->GetHyb() == 2) {
++          val[0] = 0.935;
++          val[1] = 6.42;
++          val[2] = 14.55;
++        }
++        break;
++      case 14: //Si
++        // from http://mgltools.scripps.edu/api/PyBabel/PyBabel.gasteiger-pysrc.html
++	// GG
++        if(atom->GetHyb() == 3) {
++          val[0] = 1.39;
++          val[1] = 7.3;
++          val[2] = 14.525;
++        }
++        if(atom->GetHyb() == 2) {
++          val[0] = 1.6;
++          val[1] = 7.905;
++          val[2] = 15.095;
++        }
++        if(atom->GetHyb() == 1) {
++          val[0] = 2.035;
++          val[1] = 9.065;
++          val[2] = 16.09;
++        }
++        break;
++      case 12: //Mg
++        // from http://mgltools.scripps.edu/api/PyBabel/PyBabel.gasteiger-pysrc.html
++	// GG
++        if(atom->GetHyb() == 3) {
++          val[0] = 0.16;
++          val[1] = 3.3;
++          val[2] = 11.335;
++        }
++        if(atom->GetHyb() == 2) {
++          val[0] = 0.19;
++          val[1] = 3.565;
++          val[2] = 11.335;
++        }
++        if(atom->GetHyb() == 1) {
++          val[0] = 0.39;
++          val[1] = 4.04;
++          val[2] = 11.335;
++        }
++        break;
++      case 4: // Be
++        // from http://mgltools.scripps.edu/api/PyBabel/PyBabel.gasteiger-pysrc.html
++        // GG
++	if(atom->GetHyb() == 3) {
++          val[0] = 0.255;
++          val[1] = 3.845;
++          val[2] = 13.765;
++        }
++        if(atom->GetHyb() == 2) {
++          val[0] = 0.315;
++          val[1] = 4.005;
++          val[2] = 13.765;
++        }
++        break;
++      case 26: // Fe
++        // ionization potentials from 
++        // http://en.wikipedia.org/wiki/Ionization_energies_of_the_elements_(data_page)
++        // electron affinity from
++        // http://en.wikipedia.org/wiki/Electron_affinity_(data_page)
++        // assuming 2nd electron affinity is 1.5 the first        
++	// GG
++        val[0] = 0.075500;
++        val[1] = 4.026700;
++        val[2] = 8.207150;
++        break;
++      case 27: // Co
++        // ionization potentials from 
++        // http://en.wikipedia.org/wiki/Ionization_energies_of_the_elements_(data_page)
++        // electron affinity from
++        // http://en.wikipedia.org/wiki/Electron_affinity_(data_page)
++        // assuming 2nd electron affinity is 1.5 the first
++	// GG
++        val[0] = 0.33165;
++        val[1] = 4.27215;
++        val[2] = 9.03897;
++        break;
++      case 28: // Ni
++        // ionization potentials from 
++        // http://en.wikipedia.org/wiki/Ionization_energies_of_the_elements_(data_page)
++        // electron affinity from
++        // http://en.wikipedia.org/wiki/Electron_affinity_(data_page)
++        // assuming 2nd electron affinity is 1.5 the first
++	// GG
++        val[0] = 0.57858;
++        val[1] = 4.39848;
++        val[2] = 9.95229;
++        break;
++      case 29: // Cu
++        // ionization potentials from 
++        // http://en.wikipedia.org/wiki/Ionization_energies_of_the_elements_(data_page)
++        // electron affinity from
++        // http://en.wikipedia.org/wiki/Electron_affinity_(data_page)
++        // assuming 2nd electron affinity is 1.5 the first
++	// GG
++        val[0] = 0.61789;
++        val[1] = 4.48108;
++        val[2] = 11.07304;
++        break;
++      case 30: // Zn
++        // First ionization: 9.3942 eV
++        // Second ionization: 17.96440 eV
++        // from http://en.wikipedia.org/wiki/Ionization_energies_of_the_elements_(data_page)
++        // First electron affinity: 1.138 eV
++        // Second electron affinity: 5.714 eV
++        // from DFT calculation (B3LYP & 6-31g**)
++	// GG
++        val[0] = 0.569;
++        val[1] = 5.266;
++        val[2] = 11.839;
++        break;
++      case 49: // In
++        // ionization potentials from 
++        // http://en.wikipedia.org/wiki/Ionization_energies_of_the_elements_(data_page)
++        // electron affinity from
++        // http://en.wikipedia.org/wiki/Electron_affinity_(data_page)
++        // assuming 2nd electron affinity is 1.5 the first        
++	// GG
++        val[0] = 0.19196;
++        val[1] = 3.08514;
++        val[2] = 9.72284;
+         break;
+       }
+ 
+diff -urN openbabel-2.3.2/src/mol.cpp openbabel-2.3.2-gg/src/mol.cpp
+--- openbabel-2.3.2/src/mol.cpp	2012-10-03 21:08:15.000000000 +0200
++++ openbabel-2.3.2-gg/src/mol.cpp	2025-10-24 12:13:34.529445941 +0200
+@@ -204,12 +204,40 @@
+ 	  return a->GetAngle( b, c );
+   }
+ 
++
++  double OBMol::GetTorsion(OBAtom *a,OBAtom *b,OBAtom *c,OBAtom *d)
++  {
++
++    vector3 va = a->GetVector();
++    vector3 vb = b->GetVector();
++    vector3 vc = c->GetVector();
++    vector3 vd = d->GetVector();
++    
++    // use the minimum image convention (GG)
++    OBUnitCell *uc = NULL;
++    if (this->HasData(OBGenericDataType::UnitCell))
++      {
++	// use atom a as the origin of the coordinate system
++	uc = (OBUnitCell*)this->GetData(OBGenericDataType::UnitCell);
++	vb = uc->MinimumImage(vb-va);
++	vc = uc->MinimumImage(vc-va);
++	vd = uc->MinimumImage(vd-va);
++	va.Set(0.0, 0.0, 0.0);
++      }
++
++    return(CalcTorsionAngle(va, vb, vc, vd));
++  }
++
++
+   double OBMol::GetTorsion(int a,int b,int c,int d)
+   {
+-    return(CalcTorsionAngle(((OBAtom*)_vatom[a-1])->GetVector(),
+-                            ((OBAtom*)_vatom[b-1])->GetVector(),
+-                            ((OBAtom*)_vatom[c-1])->GetVector(),
+-                            ((OBAtom*)_vatom[d-1])->GetVector()));
++    // wrapper to the function above (GG)
++    OBAtom *aa = (OBAtom*)_vatom[a-1];
++    OBAtom *ab = (OBAtom*)_vatom[b-1];
++    OBAtom *ac = (OBAtom*)_vatom[c-1];
++    OBAtom *ad = (OBAtom*)_vatom[d-1];
++
++    return(GetTorsion(aa,ab,ac,ad));
+   }
+ 
+   void OBMol::SetTorsion(OBAtom *a,OBAtom *b,OBAtom *c, OBAtom *d, double ang)
+@@ -329,14 +357,6 @@
+   }
+ 
+ 
+-  double OBMol::GetTorsion(OBAtom *a,OBAtom *b,OBAtom *c,OBAtom *d)
+-  {
+-    return(CalcTorsionAngle(a->GetVector(),
+-                            b->GetVector(),
+-                            c->GetVector(),
+-                            d->GetVector()));
+-  }
+-
+   void OBMol::ContigFragList(std::vector<std::vector<int> >&cfl)
+   {
+     int j;
+@@ -3406,8 +3426,15 @@
+     vector<double> rad;
+     vector<int> zsorted;
+     vector<int> bondCount; // existing bonds (e.g., from residues in PDB)
++    OBUnitCell *uc = NULL;
+ 
+     double *c = new double [NumAtoms()*3];
++
++    // see if we are considering a periodic structure
++    // GG
++    if (HasData(OBGenericDataType::UnitCell))
++      uc = (OBUnitCell*)GetData(OBGenericDataType::UnitCell);
++
+     rad.resize(_natoms);
+ 
+     for (j = 0, atom = BeginAtom(i) ; atom ; atom = NextAtom(i), ++j)
+@@ -3429,7 +3456,8 @@
+       }
+ 
+     int idx1, idx2;
+-    double d2,cutoff,zd;
++    double d2,cutoff2,zd;
++    vector3 vec, vec_uc, vtmp;
+     for (j = 0 ; j < max ; ++j)
+       {
+         idx1 = zsorted[j];
+@@ -3438,17 +3466,29 @@
+             idx2 = zsorted[k];
+ 
+             // bonded if closer than elemental Rcov + tolerance
+-            cutoff = SQUARE(rad[j] + rad[k] + 0.45);
++            cutoff2 = SQUARE(rad[j] + rad[k] + 0.45);
+ 
+-            zd  = SQUARE(c[idx1*3+2] - c[idx2*3+2]);
+-            if (zd > 25.0 )
+-              break; // bigger than max cutoff
++            vec.Set(c[idx1*3]   - c[idx2*3],
++                    c[idx1*3+1] - c[idx2*3+1],
++                    c[idx1*3+2] - c[idx2*3+2]);
++            
++	    // minimum image convention (GG)
++            if(uc) {
++              vec_uc = uc->MinimumImage(vec);
++	      //vtmp = vec_uc - vec;
++	      //if(vtmp.length_2() > 25.0) {
++	      //	cout << idx1 << " , " << idx2 << " : " << vec << " -> ";
++	      //	cout << vec_uc << endl;
++	      //}
++	      vec = vec_uc;
++            }
++            
++            d2 = vec.length_2();
+ 
+-            d2  = SQUARE(c[idx1*3]   - c[idx2*3]);
+-            d2 += SQUARE(c[idx1*3+1] - c[idx2*3+1]);
+-            d2 += zd;
++            // let's check all the pairs, just to be sure.
++            //if (d2 > 25.0 ) break; // bigger than max cutoff
+ 
+-            if (d2 > cutoff)
++            if (d2 > cutoff2)
+               continue;
+             if (d2 < 0.40)
+               continue;
+@@ -3456,12 +3496,12 @@
+             atom = GetAtom(idx1+1);
+             nbr  = GetAtom(idx2+1);
+ 
+-            if (atom->IsConnected(nbr))
+-              continue;
+-            if (atom->IsHydrogen() && nbr->IsHydrogen())
+-              continue;
++            if (atom->IsConnected(nbr)) continue;
++	    
++	    // we might actually have an H2 molecule, can't we? (GG)
++            if (atom->IsHydrogen() && nbr->IsHydrogen() && d2 > 1.0) continue;
+ 
+-            AddBond(idx1+1,idx2+1,1);
++	    AddBond(idx1+1,idx2+1,1);
+           }
+       }
+ 
+@@ -3526,8 +3566,9 @@
+                   }
+               }
+             DeleteBond(maxbond); // delete the new bond with the longest length
+-          }
+-      }
++          } // while()...
++
++      } // iteration on atoms
+ 
+     if (unset)
+       {
+diff -urN openbabel-2.3.2/src/ops/conformer.cpp openbabel-2.3.2-gg/src/ops/conformer.cpp
+--- openbabel-2.3.2/src/ops/conformer.cpp	2011-10-12 22:24:04.000000000 +0200
++++ openbabel-2.3.2-gg/src/ops/conformer.cpp	2025-10-24 12:13:34.529445941 +0200
+@@ -80,7 +80,8 @@
+   bool getInteger(const std::string &str, int &value)
+   {
+     std::istringstream iss(str);
+-    bool ret = iss >> value;
++    //bool ret = iss >> value;
++    bool ret = static_cast<bool>(iss >> value);
+     return ret;
+   }
+ 
+diff -urN openbabel-2.3.2/src/ops/conformer.cpp~ openbabel-2.3.2-gg/src/ops/conformer.cpp~
+--- openbabel-2.3.2/src/ops/conformer.cpp~	1970-01-01 01:00:00.000000000 +0100
++++ openbabel-2.3.2-gg/src/ops/conformer.cpp~	2025-10-24 12:13:34.530445954 +0200
+@@ -0,0 +1,174 @@
++/**********************************************************************
++conformer.cpp - A OBOp to calculate and minimize the energy using a
++                 forcefield (re-wrap of obminimize and obenergy)
++
++Copyright (C) 2010 by Tim Vandermeersch
++
++This file is part of the Open Babel project.
++For more information, see <http://openbabel.org/>
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation version 2 of the License.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++***********************************************************************/
++
++/******************************************************************************
++**** CURRENTLY ONLY SUITABLE FOR USE WITH THE OBABEL COMMANDLINE INTERFACE ****
++This allows options to have parameters, e.g. --ff Ghemical
++Compile with tools/obabel.cpp rather than tools/babel.cpp
++
++*******************************************************************************/
++
++#include <openbabel/babelconfig.h>
++#include <iostream>
++#include <openbabel/op.h>
++#include <openbabel/mol.h>
++#include <openbabel/forcefield.h>
++#include <openbabel/conformersearch.h>
++#include <openbabel/generic.h>
++
++namespace OpenBabel
++{
++  using namespace std;
++
++  //////////////////////////////////////////////////////////
++  //
++  //  OpEnergy
++  //
++  //////////////////////////////////////////////////////////
++
++  class OpConformer : public OBOp
++  {
++    public:
++      OpConformer(const char *ID) : OBOp(ID, false) {}
++
++      const char* Description()
++      {
++        return "Conformer Searching (not displayed in GUI)\n"
++          "Typical usage: obabel infile.xxx -O outfile.yy --conformer --nconf\n"
++          " options:             description\n"
++          " --log            output a log of the energies (default = no log)\n"
++          " --nconf #        number of conformers to generate\n"
++          " forcefield based methods for finding stable conformers:\n"
++          " --systematic     systematically generate all conformers\n"
++          " --random         randomly generate conformers\n"
++          " --weighted       weighted rotor search for lowest energy conformer\n"
++          " --ff #           select a forcefield (default = MMFF94)\n"
++          " genetic algorithm based methods (default):\n"
++          " --children #     number of children to generate for each parent (default = 5)\n"
++          " --mutability #   mutation frequency (default = 5)\n"
++          " --converge #     number of identical generations before convergence is reached\n"
++          " --score #        scoring function [rmsd|energy] (default = rmsd)\n"
++          ;
++      }
++
++      virtual bool WorksWith(OBBase* pOb) const
++      {
++        return dynamic_cast<OBMol*>(pOb) != NULL;
++      }
++      virtual bool Do(OBBase* pOb, const char* OptionText, OpMap* pmap, OBConversion*);
++  };
++
++  //////////////////////////////////////////////////////////
++  OpConformer theOpConformer("conformer"); //Global instance
++
++  bool getInteger(const std::string &str, int &value)
++  {
++    std::istringstream iss(str);
++    bool ret = iss >> value;
++    return ret;
++  }
++
++  //////////////////////////////////////////////////////////
++  bool OpConformer::Do(OBBase* pOb, const char* OptionText, OpMap* pmap, OBConversion*)
++  {
++    OBMol* pmol = dynamic_cast<OBMol*>(pOb);
++    if(!pmol)
++      return false;
++    pmol->AddHydrogens(false, false);
++
++    OpMap::const_iterator iter;
++    bool log = false;
++    bool systematic = false;
++    bool random = false;
++    bool weighted = false;
++    int numConformers = 30;
++
++    iter = pmap->find("log");
++    if(iter!=pmap->end())
++      log=true;
++
++    iter = pmap->find("nconf");
++    if(iter!=pmap->end())
++      getInteger(iter->second, numConformers);
++
++    iter = pmap->find("systematic");
++    if(iter!=pmap->end())
++      systematic = true;
++
++    iter = pmap->find("random");
++    if(iter!=pmap->end())
++      random = true;
++
++    iter = pmap->find("weighted");
++    if(iter!=pmap->end())
++      weighted = true;
++
++    if (systematic || random || weighted) {
++      std::string ff = "MMFF94";
++      iter = pmap->find("ff");
++      if(iter!=pmap->end())
++        ff = iter->second;
++      OBForceField* pFF = OBForceField::FindForceField(ff);
++
++      // set some force field variables
++      pFF->SetLogFile(&clog);
++      pFF->SetLogLevel(log ? OBFF_LOGLVL_MEDIUM : OBFF_LOGLVL_NONE);
++
++      if (!pFF->Setup(*pmol)) {
++        cerr  << "Could not setup force field." << endl;
++        return false;
++      }
++    } else {
++      int numChildren = 5;
++      int mutability = 5;
++      int convergence = 25;
++      std::string score = "rmsd";
++
++      iter = pmap->find("children");
++      if(iter!=pmap->end())
++        getInteger(iter->second, numChildren);
++
++      iter = pmap->find("mutability");
++      if(iter!=pmap->end())
++        getInteger(iter->second, mutability);
++
++      iter = pmap->find("convergence");
++      if(iter!=pmap->end())
++        getInteger(iter->second, convergence);
++
++      iter = pmap->find("score");
++      if(iter!=pmap->end())
++        score = iter->second;
++
++      OBConformerSearch cs;
++      if (score == "energy")
++        cs.SetScore(new OBEnergyConformerScore);
++
++      if (cs.Setup(*pmol, numConformers, numChildren, mutability, convergence)) {
++        cs.Search();
++        cs.GetConformers(*pmol);
++      }
++    }
++
++    return true;
++  }
++
++
++}//namespace
++
+diff -urN openbabel-2.3.2/src/ops/sort.cpp openbabel-2.3.2-gg/src/ops/sort.cpp
+--- openbabel-2.3.2/src/ops/sort.cpp	2010-10-10 04:05:14.000000000 +0200
++++ openbabel-2.3.2-gg/src/ops/sort.cpp	2025-10-24 12:13:34.530445954 +0200
+@@ -114,7 +114,7 @@
+     valvec.reserve(vec.size());
+     std::vector<OBBase*>::iterator iter;
+     for(iter=vec.begin();iter!=vec.end();++iter)
+-      valvec.push_back(std::make_pair<OBBase*,double>(*iter, _pDesc->Predict(*iter, &_pDescOption)));
++      valvec.push_back(std::make_pair(*iter, _pDesc->Predict(*iter, &_pDescOption)));
+ 
+     //Sort
+     std::sort(valvec.begin(),valvec.end(), Order<double>(_pDesc, _rev));
+@@ -144,7 +144,7 @@
+     for(iter=vec.begin();iter!=vec.end();++iter)
+     {
+       _pDesc->GetStringValue(*iter, s, &_pDescOption);
+-      valvec.push_back(std::make_pair<OBBase*,std::string>(*iter, s));
++      valvec.push_back(std::make_pair(*iter, s));
+     }
+ 
+     //Sort
+diff -urN openbabel-2.3.2/src/ops/sort.cpp~ openbabel-2.3.2-gg/src/ops/sort.cpp~
+--- openbabel-2.3.2/src/ops/sort.cpp~	1970-01-01 01:00:00.000000000 +0100
++++ openbabel-2.3.2-gg/src/ops/sort.cpp~	2025-10-24 12:13:34.530445954 +0200
+@@ -0,0 +1,182 @@
++/**********************************************************************
++sort.cpp - A OBOp for sorting molecules during conversion.
++
++Copyright (C) 2009 by Chris Morley
++
++This file is part of the Open Babel project.
++For more information, see <http://openbabel.org/>
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation version 2 of the License.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++***********************************************************************/
++#include <openbabel/babelconfig.h>
++#include <openbabel/op.h>
++#include <openbabel/mol.h>
++#include <openbabel/obconversion.h>
++#include <openbabel/descriptor.h>
++#include "deferred.h"
++#include <set>
++#include <algorithm>
++
++namespace OpenBabel
++{
++
++template<class T>
++struct Order : public std::binary_function<std::pair<OBBase*,T>, std::pair<OBBase*,T>, bool>
++{
++  Order(OBDescriptor* pDesc, bool rev) : _pDesc(pDesc), _rev(rev){}
++  bool operator()(std::pair<OBBase*,T> p1, std::pair<OBBase*,T> p2) const
++  {
++    return _rev ?
++      _pDesc->Order(p2.second, p1.second) :
++      _pDesc->Order(p1.second, p2.second);
++  }
++  OBDescriptor* _pDesc;
++  bool _rev;
++};
++//*****************************************************************
++class OpSort : public OBOp
++{
++public:
++  OpSort(const char* ID) : OBOp(ID, false)
++  {
++    OBConversion::RegisterOptionParam(ID, NULL, 1, OBConversion::GENOPTIONS);
++  }
++
++  const char* Description(){ return "<desc> Sort by descriptor(~desc for reverse)"
++    "\n Follow descriptor with + to also add it to the title, e.g. MW+ "
++    "\n Custom ordering is possible; see inchi descriptor"; }
++
++  virtual bool WorksWith(OBBase* pOb)const{ return dynamic_cast<OBMol*>(pOb)!=NULL; }
++  virtual bool Do(OBBase* pOb, const char* OptionText, OpMap* pmap, OBConversion* pConv);
++  virtual bool ProcessVec(std::vector<OBBase*>& vec);
++private:
++  OBDescriptor* _pDesc;
++  std::string _pDescOption;
++  bool _rev;
++  bool _addDescToTitle;
++};
++
++/////////////////////////////////////////////////////////////////
++OpSort theOpSort("sort"); //Global instance
++
++/////////////////////////////////////////////////////////////////
++bool OpSort::Do(OBBase* pOb, const char* OptionText, OpMap* pmap, OBConversion* pConv)
++{
++  if(pConv && pConv->IsFirstInput())
++  {
++    _rev=false;
++    if(*OptionText=='~')
++    {
++      _rev=true;
++      ++OptionText;
++    }
++
++    const char* pLast = OptionText + strlen(OptionText)-1;
++    _addDescToTitle = *(OptionText + strlen(OptionText)-1)=='+';//last char
++    if(_addDescToTitle)
++      *const_cast<char*>(pLast)='\0';
++
++    std::istringstream optionStream(OptionText);
++    std::pair<std::string,std::string> spair = OBDescriptor::GetIdentifier(optionStream);
++    _pDesc = OBDescriptor::FindType(spair.first.c_str());
++    if(!_pDesc)
++    {
++     obErrorLog.ThrowError(__FUNCTION__,
++              std::string("Unknown descriptor ") + OptionText, obError, onceOnly);
++     return false;
++    }
++    _pDescOption = spair.second;
++    _pDesc->Init();//needed  to clear cache of InChIFilter
++
++
++    //Make a deferred format and divert the output to it
++    new DeferredFormat(pConv, this); //it will delete itself
++  }
++  return true;
++}
++
++//****************************************************************
++bool OpSort::ProcessVec(std::vector<OBBase*>& vec)
++{
++  // Make a vector containing both the OBBase* and the descriptor value and the sort it
++  if(!IsNan(_pDesc->Predict(vec[0], &_pDescOption)))
++  {
++    //a numerical descriptor
++    //Copy into a pair vector
++    std::vector<std::pair<OBBase*,double> > valvec;
++    valvec.reserve(vec.size());
++    std::vector<OBBase*>::iterator iter;
++    for(iter=vec.begin();iter!=vec.end();++iter)
++      valvec.push_back(std::make_pair<OBBase*,double>(*iter, _pDesc->Predict(*iter, &_pDescOption)));
++
++    //Sort
++    std::sort(valvec.begin(),valvec.end(), Order<double>(_pDesc, _rev));
++
++    //Copy back
++    std::vector<std::pair<OBBase*,double> >::iterator valiter;
++    iter=vec.begin();
++    for(valiter=valvec.begin();valiter!=valvec.end();++valiter, ++iter)
++    {
++      *iter = valiter->first;
++      if(_addDescToTitle)
++      {
++        std::stringstream ss;
++        ss << (*iter)->GetTitle() << ' ' << valiter->second;
++        (*iter)->SetTitle(ss.str().c_str());
++      }
++    }
++  }
++  else
++  {
++    //a string descriptor
++    //Copy into a pair vector
++    std::vector<std::pair<OBBase*,std::string> > valvec;
++    valvec.reserve(vec.size());
++    std::vector<OBBase*>::iterator iter;
++    std::string s;
++    for(iter=vec.begin();iter!=vec.end();++iter)
++    {
++      _pDesc->GetStringValue(*iter, s, &_pDescOption);
++      valvec.push_back(std::make_pair<OBBase*,std::string>(*iter, s));
++    }
++
++    //Sort
++    std::sort(valvec.begin(),valvec.end(), Order<std::string>(_pDesc, _rev));
++
++    //Copy back
++    std::vector<std::pair<OBBase*,std::string> >::iterator valiter;
++    iter=vec.begin();
++    for(valiter=valvec.begin();valiter!=valvec.end();++valiter, ++iter)
++    {
++      *iter = valiter->first;
++      if(_addDescToTitle)
++      {
++        std::stringstream ss;
++        ss << (*iter)->GetTitle() << ' ' << valiter->second;
++        (*iter)->SetTitle(ss.str().c_str());
++      }
++    }
++  }
++
++  return true;
++}
++/*
++This started as a nice compact piece of code! The need to handle descriptors
++which return either numbers or strings was originally achieved without testing
++the type here by using LessThan() in the descriptor. But this meant that the
++descriptor value was recalculated every time it was needed, which is inappropriate
++for sorting. A local cache of InChI values was implemented but a more general
++solution was needed. The values are now calculated once and stored here in a
++vector, which stores numbers or strings and the code is extensively duplicated
++because of this. But using templates was not much shorter because four templated
++functions were needed, and the code more difficult to understand.
++*/
++
++}//namespace
+diff -urN openbabel-2.3.2/src/ops/unique.cpp openbabel-2.3.2-gg/src/ops/unique.cpp
+--- openbabel-2.3.2/src/ops/unique.cpp	2010-10-10 04:05:13.000000000 +0200
++++ openbabel-2.3.2-gg/src/ops/unique.cpp	2025-10-24 12:13:34.530445954 +0200
+@@ -24,10 +24,10 @@
+ #ifdef _MSC_VER
+   #include <unordered_map>
+ #elif (__GNUC__ == 4 && __GNUC_MINOR__ >= 1 && !defined(__APPLE_CC__))
+-  #include <tr1/unordered_map>
++  #include <unordered_map>
+ #else
+   #ifdef USE_BOOST
+-    #include <boost/tr1/unordered_map.hpp>
++    #include <boost/unordered_map.hpp>
+   #else
+     #define NO_UNORDERED_MAP
+     #include <map>
+@@ -36,7 +36,7 @@
+ 
+ using namespace std;
+ #ifndef NO_UNORDERED_MAP
+-using std::tr1::unordered_map;
++using std::unordered_map;
+ #endif
+ namespace OpenBabel
+ {
+diff -urN openbabel-2.3.2/src/ops/unique.cpp~ openbabel-2.3.2-gg/src/ops/unique.cpp~
+--- openbabel-2.3.2/src/ops/unique.cpp~	1970-01-01 01:00:00.000000000 +0100
++++ openbabel-2.3.2-gg/src/ops/unique.cpp~	2025-10-24 12:13:34.530445954 +0200
+@@ -0,0 +1,168 @@
++/**********************************************************************
++unique.cpp - A OBOp for eliminating chemically identical molecules during conversion.
++
++Copyright (C) 2009 by Chris Morley
++
++This file is part of the Open Babel project.
++For more information, see <http://openbabel.org/>
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation version 2 of the License.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++***********************************************************************/
++#include <openbabel/babelconfig.h>
++#include <openbabel/op.h>
++#include <openbabel/mol.h>
++#include <openbabel/obconversion.h>
++#include <openbabel/descriptor.h>
++#include <openbabel/inchiformat.h>
++#ifdef _MSC_VER
++  #include <unordered_map>
++#elif (__GNUC__ == 4 && __GNUC_MINOR__ >= 1 && !defined(__APPLE_CC__))
++  #include <tr1/unordered_map>
++#else
++  #ifdef USE_BOOST
++    #include <boost/tr1/unordered_map.hpp>
++  #else
++    #define NO_UNORDERED_MAP
++    #include <map>
++  #endif
++#endif
++
++using namespace std;
++#ifndef NO_UNORDERED_MAP
++using std::tr1::unordered_map;
++#endif
++namespace OpenBabel
++{
++
++class OpUnique : public OBOp
++{
++public:
++  OpUnique(const char* ID) : OBOp(ID, false){
++    OBConversion::RegisterOptionParam("unique", NULL, 1, OBConversion::GENOPTIONS);}
++
++  const char* Description(){ return
++    "[param] remove duplicates by descriptor;default inchi\n"
++    "param is a descriptor or property, or a truncation spec for InChI\n"
++    "(making the comparison less detailed, see below).\n"
++    "An OpenBabel warning message is output for each duplicate.\n"
++    "Examples: --unique   --unique cansmi   --unique /nostereo\n\n"
++
++    "/formula  formula only\n"
++    "/connect  formula and connectivity only\n"
++    "/nostereo ignore E/Z and sp3 stereochemistry\n"
++    "/sp3      ignore sp3 stereochemistry\n"
++    "/noEZ     ignore E/Z steroeochemistry\n"
++    "/nochg    ignore charge and protonation\n"
++    "/noiso    ignore isotopes\n\n"
++; }
++
++  virtual bool WorksWith(OBBase* pOb)const{ return dynamic_cast<OBMol*>(pOb)!=NULL; }
++  virtual bool Do(OBBase* pOb, const char* OptionText, OpMap* pmap, OBConversion* pConv);
++
++private:
++
++  bool _reportDup;
++  std::string _trunc;
++  OBDescriptor* _pDesc;
++  unsigned _ndups;
++
++#ifdef NO_UNORDERED_MAP
++  typedef map<std::string, std::string> UMap;
++#else
++  typedef unordered_map<std::string, std::string> UMap;
++#endif
++
++  //key is descriptor text(usually inchi) value is molecule title
++  UMap _inchimap;
++};
++
++/////////////////////////////////////////////////////////////////
++OpUnique theOpUnique("unique"); //Global instance
++
++/////////////////////////////////////////////////////////////////
++bool OpUnique::Do(OBBase* pOb, const char* OptionText, OpMap* pmap, OBConversion* pConv)
++{
++  OBMol* pmol = dynamic_cast<OBMol*>(pOb);
++  if(!pmol)
++    return false;
++
++  if(pConv->IsFirstInput())
++  {
++    _ndups=0;
++    string descID("inchi"); // the default
++    _trunc.clear();
++    if(OptionText[0]=='/')  //is parameter is /x?
++      _trunc = OptionText;
++    else if(*OptionText!='\0') // not empty?
++      descID = OptionText;
++
++    _pDesc = OBDescriptor::FindType(descID.c_str());
++    if(!_pDesc)
++    {
++      obErrorLog.ThrowError(__FUNCTION__,
++              "Cannot find descriptor " + descID, obError, onceOnly);
++      return false;
++    }
++    _pDesc->Init();
++    _inchimap.clear();
++
++    _reportDup = true; //always report duplicates
++  }
++
++  if(!_pDesc)
++    return false;
++  std::string s;
++  _pDesc->GetStringValue(pmol, s);
++
++  if(!_trunc.empty())
++    InChIFormat::EditInchi(s, _trunc);
++  std::pair<UMap::iterator, bool> result = _inchimap.insert(make_pair(s, pmol->GetTitle()));
++  bool ret = true;
++  if(!s.empty() && !result.second)
++  {
++    // InChI is already present in set
++    ++_ndups;
++    if(_reportDup)
++      clog << "Removed " << pmol->GetTitle() << " - a duplicate of " << result.first->second
++         << " (#" << _ndups << ")" << endl;
++    delete pOb;
++    ret = false; //filtered out
++  }
++  return ret;
++}
++
++
++}//namespace
++/*
++Usage: --unique param
++During conversion, this option eliminates molecules that are identical by some criterion.
++With current babel interface it needs to be last on the command line. With nbabel
++it can be anywhere.
++If param is missing the criterion is the InChI.
++If param starts with / the criterion is a truncated InChI string, see below.
++Otherwise param is taken as a descriptor or property ID and the criterion is
++its string value. Descriptors which couldbe useful here are cansmi, cansmiNS
++(ignores stereo) and possibly title.
++
++OpUnique works by attempting to insert the string value of the descriptor for
++each molecule to an internal std::unordered_map. If the string has been seen
++previously, the molecule is deleted and OpUnique::Do() returns false, which
++causes the molecule not to be output.
++
++InChI trucation values. param can be a concatination of these e.g. /nochg/noiso
++/formula  formula only
++/connect formula and connectivity only
++/nostereo ignore E/Z and sp3 stereochemistry
++/nosp3    ignore sp3 stereochemistry
++/noEZ     ignore E/Z steroeochemistry
++/nochg    ignore charge and protonation
++/noiso    ignore isotopes
++
++*/
+diff -urN openbabel-2.3.2/src/plugin.cpp openbabel-2.3.2-gg/src/plugin.cpp
+--- openbabel-2.3.2/src/plugin.cpp	2012-10-03 21:08:15.000000000 +0200
++++ openbabel-2.3.2-gg/src/plugin.cpp	2025-10-24 12:13:34.530445954 +0200
+@@ -36,7 +36,7 @@
+ 
+ OBPlugin* OBPlugin::BaseFindType(PluginMapType& Map, const char* ID)
+ {
+-  if(!ID || !*ID)
++  if(!ID || !*ID) 
+     return NULL;
+   PluginMapType::iterator itr = Map.find(ID);
+   if(itr==Map.end())
+@@ -335,6 +335,7 @@
+   plugin_ids.push_back(reinterpret_cast<OBPlugin*>(&theGasteigerCharges)->GetID());
+   plugin_ids.push_back(reinterpret_cast<OBPlugin*>(&theMMFF94Charges)->GetID());
+ #ifdef HAVE_EIGEN
++  // edited by GG
+   plugin_ids.push_back(reinterpret_cast<OBPlugin*>(&theQEqCharges)->GetID());
+   plugin_ids.push_back(reinterpret_cast<OBPlugin*>(&theQTPIECharges)->GetID());
+ #endif
