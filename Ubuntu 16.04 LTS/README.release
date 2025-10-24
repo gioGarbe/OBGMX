@@ -3,9 +3,15 @@
 #################
 (c) Giovanni Garberoglio, garberoglio@ectstar.eu
 
+---------------------------------------------------------------------------
+NOTICE
+Use these instructions in a Ubuntu 16.04 LTS environment ONLY if you cannot
+compile OBGMX on your platform.
+---------------------------------------------------------------------------
+
 OBGMX is a program that generates GROMACS topologies using the UFF force
 field, as implemented in OpenBabel 2.3.2.
-An online version, limited to 1000 atoms, runs on
+An online version, limited to 1000 atoms, used to run on
 http://software-lisc.fbk.eu/obgmx/
 The executable provided here lifts this limitation.
 
