@@ -57,6 +57,8 @@ cd build
 cmake -DCMAKE_INSTALL_PREFIX=${OB_HOME} \
       -DCMAKE_CXX_STANDARD=11  \
       -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+      # compile with gcc 12
+      -DCMAKE_CXX_FLAGS="-Wno-error=narrowing" \
       -DBUILD_SHARED=OFF ../
 
 make -j ${BUILD_THREADS}
